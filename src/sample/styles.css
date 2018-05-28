@@ -1,0 +1,22 @@
+.button, .toggle-button {
+    -fx-font: 3em 'sans-serif';
+    -fx-padding: 15;
+    -fx-background-color: #ffffff;
+    -fx-border-width: 1px;
+    -fx-border-style: solid;
+    -fx-border-color: #a2a9b1;
+    -fx-border-radius: 3;
+}
+
+.toggle-button {
+    -fx-font-size: 1.5em;
+    -fx-padding: 7.5;
+}
+
+.button:hover, .toggle-button:hover {
+    -fx-background-color: #f3f3f3;
+}
+
+.toggle-button:selected {
+    -fx-background-color: #d3d3d3;
+}
