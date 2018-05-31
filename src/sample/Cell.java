@@ -55,20 +55,20 @@ class Cell {
         return nOfNeighborsPane;
     }
 
-    boolean isMined() {
-        return mined;
-    }
-
-    void setMined() {
-        mined = true;
-    }
-
     void incNOfNeighbors() {
         nOfNeighbors++;
     }
 
     int getNOfNeighbors() {
         return nOfNeighbors;
+    }
+
+    boolean isMined() {
+        return mined;
+    }
+
+    void setMined() {
+        mined = true;
     }
 
     void setOpened() {
@@ -82,8 +82,8 @@ class Cell {
         return opened;
     }
 
-    void setMarked() {
-        marked = !marked;
+    void setMarked(boolean marked) {
+        this.marked = marked;
         setColor();
         setNOfNeighbors();
     }

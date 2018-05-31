@@ -1,39 +1,46 @@
 package sample;
 
-import javafx.scene.Group;
-import javafx.scene.control.Label;
 import java.util.*;
+import javafx.geometry.Pos;
+import javafx.scene.*;
+import javafx.scene.control.Label;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.*;
+import javafx.stage.*;
 import static java.lang.StrictMath.sqrt;
 import static sample.Main.ASPECT_RATIO;
 
-class Field {
+class Game {
     private List<List<Cell>> field = new ArrayList<>();
     private Group group = new Group();
-    private Label remainingNOfMinesLabel = new Label();
+    private Label remainingNOfMarksLabel = new Label();
+    private boolean blocked;
     private int width, height;
-    private int nOfMines, remainingNOfMines;
+    private int nOfMines, remainingNOfMarks, remainingNOfMines;
     private double windowWidth;
     private static final String DEFAULT_MODE = "medium";
 
-    Field(String mode, int nOfMines, double windowWidth) {
-        this.nOfMines = nOfMines;
+    Game(String mode, double windowWidth) {
         this.windowWidth = windowWidth;
+
+        width = 36;
+        height = (int) (width / ASPECT_RATIO * (2.0 / sqrt(3)));
 
         if (mode == null) {
             mode = DEFAULT_MODE;
         }
         switch (mode) {
             case "easy":
-                width = 24;
+                nOfMines = 70;
                 break;
             case "medium":
-                width = 36;
+                nOfMines = 105;
                 break;
             case "hard":
-                width = 48;
+                nOfMines = 140;
                 break;
         }
-        height = (int) (width / ASPECT_RATIO * (2.0 / sqrt(3)));
 
         createField();
         setMines();
@@ -45,12 +52,16 @@ class Field {
         return group;
     }
 
-    private void setRemainingNOfMinesLabel(int remainingNOfMines) {
-        remainingNOfMinesLabel.setText(String.valueOf(remainingNOfMines));
+    private void setRemainingNOfMarksLabel(int remainingNOfMines) {
+        remainingNOfMarksLabel.setText(String.valueOf(remainingNOfMines));
     }
 
-    Label getRemainingNOfMinesLabel() {
-        return remainingNOfMinesLabel;
+    Label getRemainingNOfMarksLabel() {
+        return remainingNOfMarksLabel;
+    }
+
+    private void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     void restart() {
@@ -61,6 +72,7 @@ class Field {
         }
         setMines();
         findNeighbors();
+        setBlocked(false);
     }
 
     void openAll() {
@@ -69,6 +81,7 @@ class Field {
                 field.get(i).get(j).setOpened();
             }
         }
+        setBlocked(true);
     }
 
     private List<Cell> getNeighbors(Cell cell) {
@@ -114,23 +127,78 @@ class Field {
         }
     }
 
+    private void createGameResultStage(boolean win) {
+        Stage resultStage = new Stage(StageStyle.TRANSPARENT);
+
+        Text resultText = new Text();
+        if (win) {
+            resultText.setText("Вы выиграли");
+        }
+        else {
+            resultText.setText("Вы проиграли");
+        }
+
+        HBox resultPane = new HBox();
+        resultPane.setMinWidth(windowWidth * 0.33);
+        resultPane.setMinHeight(windowWidth * 0.33 / ASPECT_RATIO);
+        resultPane.getChildren().add(resultText);
+        resultPane.setAlignment(Pos.CENTER);
+        resultPane.getStyleClass().add("result-pane");
+        resultPane.setOnMouseClicked(t -> resultStage.close());
+
+        Scene resultScene = new Scene(resultPane);
+        resultScene.getStylesheets().add("sample/styles.css");
+        resultScene.setFill(Color.TRANSPARENT);
+
+        resultStage.setScene(resultScene);
+        resultStage.show();
+    }
+
     private void addMouseListener() {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
+
                 Cell cell = field.get(i).get(j);
                 cell.getHexagon().setOnMousePressed(t -> {
-                    if (t.isPrimaryButtonDown()) {
-                        openWithNeighbours(cell);
-                    }
-                    if (t.isSecondaryButtonDown()) {
-                        cell.setMarked();
-                        if (cell.isMarked()) {
-                            remainingNOfMines--;
+
+                    if (!blocked) {
+
+                        if (t.isPrimaryButtonDown()) {
+                            if (cell.isMarked()) {
+                                cell.setMarked(false);
+                                remainingNOfMarks++;
+                            }
+                            if (cell.isMined()) {
+                                openAll();
+                                setBlocked(true);
+                                createGameResultStage(false);
+                            }
+                            openWithNeighbours(cell);
                         }
-                        else {
-                            remainingNOfMines++;
+
+                        if (t.isSecondaryButtonDown()) {
+
+                            if (cell.isMarked()) {
+                                cell.setMarked(false);
+                                remainingNOfMarks++;
+                                if (cell.isMined()) {
+                                    remainingNOfMines++;
+                                }
+                            }
+
+                            else if (remainingNOfMarks > 0) {
+                                cell.setMarked(true);
+                                remainingNOfMarks--;
+                                if (cell.isMined()) {
+                                    remainingNOfMines--;
+                                    if (remainingNOfMines == 0) {
+                                        setBlocked(true);
+                                        createGameResultStage(true);
+                                    }
+                                }
+                            }
                         }
-                        setRemainingNOfMinesLabel(remainingNOfMines);
+                        setRemainingNOfMarksLabel(remainingNOfMarks);
                     }
                 });
             }
@@ -152,8 +220,9 @@ class Field {
     }
 
     private void setMines() {
+        remainingNOfMarks = nOfMines;
         remainingNOfMines = nOfMines;
-        setRemainingNOfMinesLabel(remainingNOfMines);
+        setRemainingNOfMarksLabel(remainingNOfMarks);
         int _nOfMines = nOfMines;
         while (_nOfMines > 0) {
             int randWidth = new Random().nextInt(width);
@@ -171,9 +240,10 @@ class Field {
             List<Cell> row = new ArrayList<>();
             for (int j = 0; j < height; j++) {
                 Cell cell = new Cell((i + 0.5 * (j % 2)) * sideLength * sqrt(3), j * sideLength * 1.5, sideLength);
-                row.add(cell);
                 cell.setIndexX(i);
                 cell.setIndexY(j);
+                row.add(cell);
+
                 group.getChildren().add(cell.getHexagon());
                 group.getChildren().add(cell.getNOfNeighborsPane());
             }
