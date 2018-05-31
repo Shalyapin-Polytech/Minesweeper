@@ -8,9 +8,7 @@ import javafx.scene.text.*;
 import static java.lang.Math.*;
 
 class Cell {
-    private double coordX, coordY;
     private int indexX, indexY;
-    private double sideLength;
     private boolean mined, opened, marked;
     private int nOfNeighbors = 0;
     private Text nOfNeighborsText = new Text();
@@ -22,25 +20,22 @@ class Cell {
     private static final Color MARKED_CELL = Color.rgb(0, 0, 0);
 
     Cell(double coordX, double coordY, double sideLength) {
-        this.coordX = coordX;
-        this.coordY = coordY;
-        this.sideLength = sideLength;
         this.opened = false;
         this.mined = false;
 
-        createCell();
+        createCell(coordX, coordY, sideLength);
     }
 
     void setIndexX(int indexX) {
         this.indexX = indexX;
     }
 
-    void setIndexY(int indexY) {
-        this.indexY = indexY;
-    }
-
     int getIndexX() {
         return indexX;
+    }
+
+    void setIndexY(int indexY) {
+        this.indexY = indexY;
     }
 
     int getIndexY() {
@@ -63,12 +58,12 @@ class Cell {
         return nOfNeighbors;
     }
 
-    boolean isMined() {
-        return mined;
-    }
-
     void setMined() {
         mined = true;
+    }
+
+    boolean isMined() {
+        return mined;
     }
 
     void setOpened() {
@@ -128,7 +123,7 @@ class Cell {
         }
     }
 
-    private void createCell() {
+    private void createCell(double coordX, double coordY, double sideLength) {
         for (int i = 0; i < 6; i++) {
             hexagon.getPoints().add(coordX + sideLength * cos((2 * i + 1) * PI / 6));
             hexagon.getPoints().add(coordY + sideLength * sin((2 * i + 1) * PI / 6));

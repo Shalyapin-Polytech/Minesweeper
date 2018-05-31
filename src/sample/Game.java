@@ -18,31 +18,27 @@ class Game {
     private boolean blocked;
     private int width, height;
     private int nOfMines, remainingNOfMarks, remainingNOfMines;
-    private double windowWidth;
-    private static final String DEFAULT_MODE = "medium";
 
     Game(String mode, double windowWidth) {
-        this.windowWidth = windowWidth;
-
         width = 36;
         height = (int) (width / ASPECT_RATIO * (2.0 / sqrt(3)));
 
         if (mode == null) {
-            mode = DEFAULT_MODE;
+            mode = "medium";
         }
         switch (mode) {
             case "easy":
                 nOfMines = 70;
                 break;
             case "medium":
-                nOfMines = 105;
+                nOfMines = 100;
                 break;
             case "hard":
-                nOfMines = 140;
+                nOfMines = 130;
                 break;
         }
 
-        createField();
+        createField(windowWidth);
         setMines();
         findNeighbors();
         addMouseListener();
@@ -139,8 +135,8 @@ class Game {
         }
 
         HBox resultPane = new HBox();
-        resultPane.setMinWidth(windowWidth * 0.33);
-        resultPane.setMinHeight(windowWidth * 0.33 / ASPECT_RATIO);
+        resultPane.setMinWidth(500);
+        resultPane.setMinHeight(500 / ASPECT_RATIO);
         resultPane.getChildren().add(resultText);
         resultPane.setAlignment(Pos.CENTER);
         resultPane.getStyleClass().add("result-pane");
@@ -234,7 +230,7 @@ class Game {
         }
     }
 
-    private void createField() {
+    private void createField(double windowWidth) {
         double sideLength = windowWidth / ( sqrt(3) * width );
         for (int i = 0; i < width; i++) {
             List<Cell> row = new ArrayList<>();
