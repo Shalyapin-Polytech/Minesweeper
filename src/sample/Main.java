@@ -5,13 +5,14 @@ import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
+import javafx.stage.*;
 
 public class Main extends Application {
+    private static final Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+    private static final double WINDOW_WIDTH = bounds.getWidth() * 0.8;
+    private static final double WINDOW_HEIGHT = bounds.getHeight() * 0.8;
+    static final double ASPECT_RATIO = WINDOW_WIDTH / WINDOW_HEIGHT;
     private String gameMode;
-    static final double ASPECT_RATIO = 16.0 / 9.0;
-    private static final double WINDOW_WIDTH = 1500;
-    private static final double WINDOW_HEIGHT = WINDOW_WIDTH / ASPECT_RATIO;
 
     private void createGameScene(Stage primaryStage) {
         Game game = new Game(gameMode, WINDOW_WIDTH * 0.8);

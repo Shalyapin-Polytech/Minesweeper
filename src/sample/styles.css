@@ -32,5 +32,4 @@
     -fx-border-style: solid;
     -fx-border-width: 1;
     -fx-effect: dropshadow(three-pass-box, rgba(161, 161, 161), 10, 0.5, 0, 0);
-
 }
