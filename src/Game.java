@@ -1,5 +1,3 @@
-package sample;
-
 import java.util.*;
 import javafx.geometry.Pos;
 import javafx.scene.*;
@@ -9,7 +7,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.*;
 import static java.lang.StrictMath.sqrt;
-import static sample.Main.ASPECT_RATIO;
 
 class Game {
     private List<List<Cell>> field = new ArrayList<>();
@@ -21,7 +18,7 @@ class Game {
 
     Game(String mode, double windowWidth) {
         width = 36;
-        height = (int) (width / ASPECT_RATIO * (2.0 / sqrt(3)));
+        height = (int) (width * 0.9 / Main.ASPECT_RATIO * (2.0 / sqrt(3)));
 
         if (mode == null) {
             mode = "medium";
@@ -136,14 +133,14 @@ class Game {
 
         HBox resultPane = new HBox();
         resultPane.setMinWidth(500);
-        resultPane.setMinHeight(500 / ASPECT_RATIO);
+        resultPane.setMinHeight(500 / Main.ASPECT_RATIO);
         resultPane.getChildren().add(resultText);
         resultPane.setAlignment(Pos.CENTER);
         resultPane.getStyleClass().add("result-pane");
         resultPane.setOnMouseClicked(t -> resultStage.close());
 
         Scene resultScene = new Scene(resultPane);
-        resultScene.getStylesheets().add("sample/styles.css");
+        resultScene.getStylesheets().add("styles.css");
         resultScene.setFill(Color.TRANSPARENT);
 
         resultStage.setScene(resultScene);
@@ -160,15 +157,18 @@ class Game {
                     if (!blocked) {
 
                         if (t.isPrimaryButtonDown()) {
+
                             if (cell.isMarked()) {
                                 cell.setMarked(false);
                                 remainingNOfMarks++;
                             }
+
                             if (cell.isMined()) {
                                 openAll();
                                 setBlocked(true);
                                 createGameResultStage(false);
                             }
+
                             openWithNeighbours(cell);
                         }
 

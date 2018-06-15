@@ -1,16 +1,25 @@
+.game-menu-pane .button {
+    -fx-font-size: 2em;
+    -fx-padding: 0.9em;
+}
+
+.main-menu-pane .button {
+    -fx-font-size: 3em;
+    -fx-padding: 1.2em;
+}
+
+.main-menu-pane .toggle-button {
+    -fx-font-size: 1.5em;
+    -fx-padding: 0.75em;
+}
+
 .button, .toggle-button {
-    -fx-font: 3em 'sans-serif';
-    -fx-padding: 15;
+    -fx-font-family: 'sans-serif';
     -fx-background-color: #ffffff;
     -fx-border-width: 1px;
     -fx-border-style: solid;
     -fx-border-color: #a2a9b1;
     -fx-border-radius: 3;
-}
-
-.toggle-button {
-    -fx-font-size: 1.5em;
-    -fx-padding: 7.5;
 }
 
 .button:hover, .toggle-button:hover {
