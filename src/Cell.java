@@ -1,3 +1,6 @@
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Background;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -9,7 +12,7 @@ class Cell {
     private int indexX, indexY;
     private boolean mined, opened, marked;
     private int nOfNeighbors = 0;
-    private Text nOfNeighborsText = new Text();
+    private Label nOfNeighborsText = new Label();
     private StackPane nOfNeighborsPane = new StackPane();
     private Polygon hexagon = new Polygon();
     private static final Color CLOSED_CELL = Color.rgb(128, 128, 128);
@@ -44,8 +47,8 @@ class Cell {
         return hexagon;
     }
 
-    StackPane getNOfNeighborsPane() {
-        return nOfNeighborsPane;
+    Label getNOfNeighborsPane() {
+        return nOfNeighborsText;
     }
 
     void incNOfNeighbors() {
@@ -127,16 +130,15 @@ class Cell {
             hexagon.getPoints().add(coordX + _sideLength * cos((2 * i + 1) * PI / 6));
             hexagon.getPoints().add(coordY + _sideLength * sin((2 * i + 1) * PI / 6));
         }
+
         setColor();
         setNOfNeighbors();
 
-        nOfNeighborsText.setFont(new Font(sideLength));
-        nOfNeighborsText.setBoundsType(TextBoundsType.VISUAL);
-        nOfNeighborsText.setLayoutX(coordX);
-        nOfNeighborsText.setLayoutY(coordY);
-
-        nOfNeighborsPane.setLayoutX(coordX);
-        nOfNeighborsPane.setLayoutY(coordY);
-        nOfNeighborsPane.getChildren().add(nOfNeighborsText);
+        nOfNeighborsText.setLayoutX(coordX - _sideLength * sqrt(3) / 2);
+        nOfNeighborsText.setLayoutY(coordY - _sideLength);
+        nOfNeighborsText.setMinWidth(_sideLength * sqrt(3));
+        nOfNeighborsText.setMinHeight(_sideLength * 2);
+        nOfNeighborsText.setFont(new Font(_sideLength));
+        nOfNeighborsText.setAlignment(Pos.CENTER);
     }
 }

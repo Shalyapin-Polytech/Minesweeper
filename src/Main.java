@@ -12,7 +12,7 @@ public class Main extends Application {
     static final double ASPECT_RATIO = WINDOW_WIDTH / WINDOW_HEIGHT;
     private String gameMode;
 
-    private void createGameScene(Stage primaryStage) {
+    private Scene createGameScene(Stage primaryStage) {
         Game game = new Game(gameMode, WINDOW_WIDTH * 0.8);
 
         HBox gameMenuPane = new HBox();
@@ -29,7 +29,7 @@ public class Main extends Application {
         gameMenuPane.getChildren().add(openAllButton);
 
         Button exitToMenuButton = new Button("Выход в меню");
-        exitToMenuButton.setOnAction(event -> createMenuScene(primaryStage));
+        exitToMenuButton.setOnAction(event -> primaryStage.setScene(createMenuScene(primaryStage)));
         gameMenuPane.getChildren().add(exitToMenuButton);
 
         gameMenuPane.getChildren().add(game.getRemainingNOfMarksLabel());
@@ -45,10 +45,12 @@ public class Main extends Application {
         Scene gameScene = new Scene(gamePane, WINDOW_WIDTH, WINDOW_HEIGHT);
         gameScene.getStylesheets().add("styles.css");
 
-        primaryStage.setScene(gameScene);
+        return gameScene;
+
+        //primaryStage.setScene(gameScene);
     }
 
-    private void createMenuScene(Stage primaryStage) {
+    private Scene createMenuScene(Stage primaryStage) {
         GridPane mainMenuPane = new GridPane();
         mainMenuPane.setPadding(new Insets(200));
         mainMenuPane.setVgap(50);
@@ -56,7 +58,7 @@ public class Main extends Application {
         mainMenuPane.getStyleClass().add("main-menu-pane");
 
         Button startButton = new Button("Новая игра");
-        startButton.setOnAction(event -> createGameScene(primaryStage));
+        startButton.setOnAction(event -> primaryStage.setScene(createGameScene(primaryStage)));
         mainMenuPane.add(startButton, 0, 0);
 
         GridPane chooseModePane = new GridPane();
@@ -88,14 +90,18 @@ public class Main extends Application {
         Scene menuScene = new Scene(mainMenuPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         menuScene.getStylesheets().add("styles.css");
 
-        primaryStage.setScene(menuScene);
+        return menuScene;
+
+        //primaryStage.setScene(menuScene);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Сапёр");
         primaryStage.setMaximized(true);
-        createMenuScene(primaryStage);
+        Scene menuScene = createMenuScene(primaryStage);
+        Scene gameScene = createGameScene(primaryStage);
+        primaryStage.setScene(menuScene);
         primaryStage.show();
     }
 

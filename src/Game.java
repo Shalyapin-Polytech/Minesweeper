@@ -152,7 +152,7 @@ class Game {
             for (int j = 0; j < height; j++) {
 
                 Cell cell = field.get(i).get(j);
-                cell.getHexagon().setOnMousePressed(t -> {
+                cell.getNOfNeighborsPane().setOnMousePressed(t -> {
 
                     if (!blocked) {
 
