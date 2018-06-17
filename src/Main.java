@@ -46,8 +46,6 @@ public class Main extends Application {
         gameScene.getStylesheets().add("styles.css");
 
         return gameScene;
-
-        //primaryStage.setScene(gameScene);
     }
 
     private Scene createMenuScene(Stage primaryStage) {
@@ -91,17 +89,13 @@ public class Main extends Application {
         menuScene.getStylesheets().add("styles.css");
 
         return menuScene;
-
-        //primaryStage.setScene(menuScene);
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Сапёр");
         primaryStage.setMaximized(true);
-        Scene menuScene = createMenuScene(primaryStage);
-        Scene gameScene = createGameScene(primaryStage);
-        primaryStage.setScene(menuScene);
+        primaryStage.setScene(createMenuScene(primaryStage));
         primaryStage.show();
     }
 
