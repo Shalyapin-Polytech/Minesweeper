@@ -122,9 +122,10 @@ class Cell {
     }
 
     private void createCell(double coordX, double coordY, double sideLength) {
+        double _sideLength = sideLength * 0.95;
         for (int i = 0; i < 6; i++) {
-            hexagon.getPoints().add(coordX + sideLength * cos((2 * i + 1) * PI / 6));
-            hexagon.getPoints().add(coordY + sideLength * sin((2 * i + 1) * PI / 6));
+            hexagon.getPoints().add(coordX + _sideLength * cos((2 * i + 1) * PI / 6));
+            hexagon.getPoints().add(coordY + _sideLength * sin((2 * i + 1) * PI / 6));
         }
         setColor();
         setNOfNeighbors();

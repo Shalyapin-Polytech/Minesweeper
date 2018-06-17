@@ -7,8 +7,8 @@ import javafx.stage.*;
 
 public class Main extends Application {
     private static final Rectangle2D VISUAL_BOUNDS = Screen.getPrimary().getVisualBounds();
-    private static final double WINDOW_WIDTH = VISUAL_BOUNDS.getWidth() * 0.85;
-    private static final double WINDOW_HEIGHT = VISUAL_BOUNDS.getHeight() * 0.85;
+    private static final double WINDOW_WIDTH = VISUAL_BOUNDS.getWidth();
+    private static final double WINDOW_HEIGHT = VISUAL_BOUNDS.getHeight();
     static final double ASPECT_RATIO = WINDOW_WIDTH / WINDOW_HEIGHT;
     private String gameMode;
 
@@ -94,6 +94,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Сапёр");
+        primaryStage.setMaximized(true);
         createMenuScene(primaryStage);
         primaryStage.show();
     }
