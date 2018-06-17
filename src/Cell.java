@@ -1,7 +1,5 @@
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.text.*;
@@ -12,8 +10,7 @@ class Cell {
     private int indexX, indexY;
     private boolean mined, opened, marked;
     private int nOfNeighbors = 0;
-    private Label nOfNeighborsText = new Label();
-    private StackPane nOfNeighborsPane = new StackPane();
+    private Label nOfNeighborsLabel = new Label();
     private Polygon hexagon = new Polygon();
     private static final Color CLOSED_CELL = Color.rgb(128, 128, 128);
     private static final Color OPENED_EMPTY_CELL = Color.rgb(253, 234, 168);
@@ -47,8 +44,8 @@ class Cell {
         return hexagon;
     }
 
-    Label getNOfNeighborsPane() {
-        return nOfNeighborsText;
+    Label getNOfNeighborsLabel() {
+        return nOfNeighborsLabel;
     }
 
     void incNOfNeighbors() {
@@ -117,10 +114,10 @@ class Cell {
 
     private void setNOfNeighbors() {
         if (opened && !mined && !marked && nOfNeighbors > 0) {
-            nOfNeighborsText.setText(String.valueOf(nOfNeighbors));
+            nOfNeighborsLabel.setText(String.valueOf(nOfNeighbors));
         }
         else {
-            nOfNeighborsText.setText("");
+            nOfNeighborsLabel.setText("");
         }
     }
 
@@ -134,11 +131,11 @@ class Cell {
         setColor();
         setNOfNeighbors();
 
-        nOfNeighborsText.setLayoutX(coordX - _sideLength * sqrt(3) / 2);
-        nOfNeighborsText.setLayoutY(coordY - _sideLength);
-        nOfNeighborsText.setMinWidth(_sideLength * sqrt(3));
-        nOfNeighborsText.setMinHeight(_sideLength * 2);
-        nOfNeighborsText.setFont(new Font(_sideLength));
-        nOfNeighborsText.setAlignment(Pos.CENTER);
+        nOfNeighborsLabel.setLayoutX(coordX - _sideLength * sqrt(3) / 2);
+        nOfNeighborsLabel.setLayoutY(coordY - _sideLength);
+        nOfNeighborsLabel.setMinWidth(_sideLength * sqrt(3));
+        nOfNeighborsLabel.setMinHeight(_sideLength * 2);
+        nOfNeighborsLabel.setFont(new Font(_sideLength));
+        nOfNeighborsLabel.setAlignment(Pos.CENTER);
     }
 }
