@@ -72,7 +72,7 @@ class Cell {
         opened = true;
         marked = false;
         recolor();
-        overwriteNOfNeighborsLabel();
+        rewriteNOfNeighborsLabel();
     }
 
     boolean isOpened() {
@@ -82,7 +82,7 @@ class Cell {
     void setMarked(boolean marked) {
         this.marked = marked;
         recolor();
-        overwriteNOfNeighborsLabel();
+        rewriteNOfNeighborsLabel();
     }
 
     boolean isMarked() {
@@ -95,7 +95,7 @@ class Cell {
         marked = false;
         recolor();
         nOfNeighbors = 0;
-        overwriteNOfNeighborsLabel();
+        rewriteNOfNeighborsLabel();
     }
 
     private void recolor() {
@@ -116,7 +116,7 @@ class Cell {
         }
     }
 
-    private void overwriteNOfNeighborsLabel() {
+    private void rewriteNOfNeighborsLabel() {
         if (opened && !mined && !marked && nOfNeighbors > 0) {
             nOfNeighborsLabel.setText(String.valueOf(nOfNeighbors));
         }
@@ -136,7 +136,7 @@ class Cell {
         actionListenerHexagon.setFill(Color.TRANSPARENT);
 
         recolor();
-        overwriteNOfNeighborsLabel();
+        rewriteNOfNeighborsLabel();
 
         nOfNeighborsLabel.setLayoutX(coordX - sideLength * sqrt(3) / 2);
         nOfNeighborsLabel.setLayoutY(coordY - sideLength);
