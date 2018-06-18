@@ -18,22 +18,25 @@ class Game {
 
     Game(String mode, double windowWidth) {
         width = 36;
-        height = (int) (width * 0.9 / Main.ASPECT_RATIO * (2.0 / sqrt(3)));
+        height = (int) ((width / Main.ASPECT_RATIO) * (2.0 / sqrt(3)) * 0.9);
+        int nOfCells = width * height;
+        double proportionOfMines = 0;
 
         if (mode == null) {
             mode = "medium";
         }
         switch (mode) {
             case "easy":
-                nOfMines = 70;
+                proportionOfMines = 0.1;
                 break;
             case "medium":
-                nOfMines = 100;
+                proportionOfMines = 0.15;
                 break;
             case "hard":
-                nOfMines = 130;
+                proportionOfMines = 0.18;
                 break;
         }
+        nOfMines = (int) (nOfCells * proportionOfMines);
 
         createField(windowWidth);
         setMines();
