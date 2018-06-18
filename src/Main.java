@@ -6,15 +6,17 @@ import javafx.scene.layout.*;
 import javafx.stage.*;
 
 public class Main extends Application {
+    private Game game = new Game();
+    private Stage primaryStage;
+    private Scene menuScene = createMenuScene();
+    private Scene gameScene = createGameScene();
+
     private static final Rectangle2D VISUAL_BOUNDS = Screen.getPrimary().getVisualBounds();
-    private static final double WINDOW_WIDTH = VISUAL_BOUNDS.getWidth();
+    static final double WINDOW_WIDTH = VISUAL_BOUNDS.getWidth();
     private static final double WINDOW_HEIGHT = VISUAL_BOUNDS.getHeight();
     static final double ASPECT_RATIO = WINDOW_WIDTH / WINDOW_HEIGHT;
-    private String gameMode;
 
-    private Scene createGameScene(Stage primaryStage) {
-        Game game = new Game(gameMode, WINDOW_WIDTH * 0.8);
-
+    private Scene createGameScene() {
         HBox gameMenuPane = new HBox();
         gameMenuPane.setAlignment(Pos.CENTER);
         gameMenuPane.setSpacing(50);
@@ -29,7 +31,7 @@ public class Main extends Application {
         gameMenuPane.getChildren().add(openAllButton);
 
         Button exitToMenuButton = new Button("Выход в меню");
-        exitToMenuButton.setOnAction(event -> primaryStage.setScene(createMenuScene(primaryStage)));
+        exitToMenuButton.setOnAction(event -> primaryStage.setScene(menuScene));
         gameMenuPane.getChildren().add(exitToMenuButton);
 
         gameMenuPane.getChildren().add(game.getRemainingNOfMarksLabel());
@@ -48,16 +50,30 @@ public class Main extends Application {
         return gameScene;
     }
 
-    private Scene createMenuScene(Stage primaryStage) {
+    private Scene createMenuScene() {
         GridPane mainMenuPane = new GridPane();
         mainMenuPane.setPadding(new Insets(200));
-        mainMenuPane.setVgap(50);
+        mainMenuPane.setVgap(40);
         mainMenuPane.setAlignment(Pos.TOP_LEFT);
         mainMenuPane.getStyleClass().add("main-menu-pane");
 
         Button startButton = new Button("Новая игра");
-        startButton.setOnAction(event -> primaryStage.setScene(createGameScene(primaryStage)));
+        Button continueButton = new Button("Продолжить");
+        Button exitButton = new Button("Выход");
+
+        startButton.setOnAction(event -> {
+            game.restart();
+            continueButton.setDisable(false);
+            primaryStage.setScene(gameScene);
+        });
         mainMenuPane.add(startButton, 0, 0);
+
+        continueButton.setDisable(true);
+        continueButton.setOnAction(event -> primaryStage.setScene(gameScene));
+        mainMenuPane.add(continueButton, 0, 1);
+
+        exitButton.setOnAction(event -> System.exit(0));
+        mainMenuPane.add(exitButton, 0, 3);
 
         GridPane chooseModePane = new GridPane();
         chooseModePane.setHgap(50);
@@ -65,25 +81,32 @@ public class Main extends Application {
         ToggleGroup choiceMode = new ToggleGroup();
 
         ToggleButton easyModeItem = new ToggleButton("Простой");
-        easyModeItem.setOnAction(event -> gameMode = "easy");
+        ToggleButton mediumModeItem = new ToggleButton("Средний");
+        ToggleButton hardModeItem = new ToggleButton("Сложный");
+
+        easyModeItem.setOnAction(event -> {
+            continueButton.setDisable(true);
+            game.setGameMode("easy");
+        });
         easyModeItem.setToggleGroup(choiceMode);
         chooseModePane.add(easyModeItem, 0, 0);
 
-        ToggleButton mediumModeItem = new ToggleButton("Средний");
-        mediumModeItem.setOnAction(event -> gameMode = "medium");
+
+        mediumModeItem.setOnAction(event -> {
+            continueButton.setDisable(true);
+            game.setGameMode("medium");
+        });
         mediumModeItem.setToggleGroup(choiceMode);
         chooseModePane.add(mediumModeItem, 1, 0);
 
-        ToggleButton hardModeItem = new ToggleButton("Сложный");
-        hardModeItem.setOnAction(event -> gameMode = "hard");
+        hardModeItem.setOnAction(event -> {
+            continueButton.setDisable(true);
+            game.setGameMode("hard");
+        });
         hardModeItem.setToggleGroup(choiceMode);
         chooseModePane.add(hardModeItem, 2, 0);
 
-        mainMenuPane.add(chooseModePane, 0, 1);
-
-        Button exitButton = new Button("Выход");
-        exitButton.setOnAction(event -> System.exit(0));
-        mainMenuPane.add(exitButton, 0, 2);
+        mainMenuPane.add(chooseModePane, 0, 2);
 
         Scene menuScene = new Scene(mainMenuPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         menuScene.getStylesheets().add("styles.css");
@@ -93,9 +116,10 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+        this.primaryStage = primaryStage;
         primaryStage.setTitle("Сапёр");
         primaryStage.setMaximized(true);
-        primaryStage.setScene(createMenuScene(primaryStage));
+        primaryStage.setScene(menuScene);
         primaryStage.show();
     }
 

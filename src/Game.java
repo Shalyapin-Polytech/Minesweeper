@@ -12,33 +12,16 @@ class Game {
     private List<List<Cell>> field = new ArrayList<>();
     private Group group = new Group();
     private Label remainingNOfMarksLabel = new Label();
+    private String gameMode;
     private boolean blocked;
     private int width, height;
-    private int nOfMines, remainingNOfMarks, remainingNOfMines;
+    private int remainingNOfMarks, remainingNOfMines = 0;
 
-    Game(String mode, double windowWidth) {
+    Game() {
         width = 36;
         height = (int) ((width / Main.ASPECT_RATIO) * (2.0 / sqrt(3)) * 0.9);
-        int nOfCells = width * height;
-        double proportionOfMines = 0;
 
-        if (mode == null) {
-            mode = "medium";
-        }
-        switch (mode) {
-            case "easy":
-                proportionOfMines = 0.1;
-                break;
-            case "medium":
-                proportionOfMines = 0.15;
-                break;
-            case "hard":
-                proportionOfMines = 0.18;
-                break;
-        }
-        nOfMines = (int) (nOfCells * proportionOfMines);
-
-        createField(windowWidth);
+        createField();
         setMines();
         findNeighbors();
     }
@@ -57,6 +40,11 @@ class Game {
 
     private void setBlocked(boolean blocked) {
         this.blocked = blocked;
+    }
+
+    void setGameMode(String gameMode) {
+        this.gameMode = gameMode;
+        restart();
     }
 
     void restart() {
@@ -193,6 +181,24 @@ class Game {
     }
 
     private void setMines() {
+        int nOfCells = width * height;
+        double proportionOfMines = 0;
+
+        if (gameMode == null) {
+            gameMode = "medium";
+        }
+        switch (gameMode) {
+            case "easy":
+                proportionOfMines = 0.1;
+                break;
+            case "medium":
+                proportionOfMines = 0.15;
+                break;
+            case "hard":
+                proportionOfMines = 0.18;
+                break;
+        }
+        int nOfMines = (int) (nOfCells * proportionOfMines);
         remainingNOfMarks = nOfMines;
         remainingNOfMines = nOfMines;
         setRemainingNOfMarksLabel(remainingNOfMarks);
@@ -206,8 +212,8 @@ class Game {
         }
     }
 
-    private void createField(double windowWidth) {
-        double sideLength = windowWidth / ( sqrt(3) * width );
+    private void createField() {
+        double sideLength = Main.WINDOW_WIDTH * 0.8 / ( sqrt(3) * width );
         for (int i = 0; i < width; i++) {
             List<Cell> row = new ArrayList<>();
             for (int j = 0; j < height; j++) {

@@ -6,12 +6,13 @@ import javafx.scene.text.Font;
 import static java.lang.Math.*;
 
 class Cell {
+    private Polygon hexagon = new Polygon();
+    private Polygon actionListenerHexagon = new Polygon();
+    private Label nOfNeighborsLabel = new Label();
     private int indexX, indexY;
     private boolean mined, opened, marked;
     private int nOfNeighbors = 0;
-    private Label nOfNeighborsLabel = new Label();
-    private Polygon hexagon = new Polygon();
-    private Polygon actionListenerHexagon = new Polygon();
+
     private static final Color CLOSED_CELL = Color.rgb(128, 128, 128);
     private static final Color OPENED_EMPTY_CELL = Color.rgb(253, 234, 168);
     private static final Color OPENED_MINED_CELL = Color.rgb(220, 20, 60);
