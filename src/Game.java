@@ -38,7 +38,6 @@ class Game {
         createField(windowWidth);
         setMines();
         findNeighbors();
-        addMouseListener();
     }
 
     Group getGroup() {
@@ -58,22 +57,14 @@ class Game {
     }
 
     void restart() {
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                field.get(i).get(j).clear();
-            }
-        }
+        field.forEach(cells -> cells.forEach(Cell::clear));
         setMines();
         findNeighbors();
         setBlocked(false);
     }
 
     void openAll() {
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                field.get(i).get(j).setOpened();
-            }
-        }
+        field.forEach(cells -> cells.forEach(Cell::setOpened));
         setBlocked(true);
     }
 
@@ -108,13 +99,13 @@ class Game {
         return neighbors;
     }
 
-    private void openWithNeighbours(Cell cell) {
+    private void openWithNeighbors(Cell cell) {
         cell.setOpened();
         List<Cell> neighbors = getNeighbors(cell);
         if (!cell.isMined() && cell.getNOfNeighbors() == 0) {
             for (Cell neighbor : neighbors) {
                 if (!neighbor.isOpened()) {
-                    openWithNeighbours(neighbor);
+                    openWithNeighbors(neighbor);
                 }
             }
         }
@@ -147,72 +138,63 @@ class Game {
         resultStage.show();
     }
 
-    private void addMouseListener() {
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
+    private void addMouseListener(Cell cell) {
+        cell.getActionListenerHexagon().setOnMousePressed(t -> {
 
-                Cell cell = field.get(i).get(j);
-                cell.getActionListenerHexagon().setOnMousePressed(t -> {
+            if (!blocked) {
 
-                    if (!blocked) {
+                if (t.isPrimaryButtonDown()) {
 
-                        if (t.isPrimaryButtonDown()) {
-
-                            if (cell.isMarked()) {
-                                cell.setMarked(false);
-                                remainingNOfMarks++;
-                            }
-
-                            if (cell.isMined()) {
-                                openAll();
-                                setBlocked(true);
-                                createGameResultStage(false);
-                            }
-
-                            openWithNeighbours(cell);
-                        }
-
-                        if (t.isSecondaryButtonDown()) {
-
-                            if (cell.isMarked()) {
-                                cell.setMarked(false);
-                                remainingNOfMarks++;
-                                if (cell.isMined()) {
-                                    remainingNOfMines++;
-                                }
-                            }
-
-                            else if (remainingNOfMarks > 0) {
-                                cell.setMarked(true);
-                                remainingNOfMarks--;
-                                if (cell.isMined()) {
-                                    remainingNOfMines--;
-                                    if (remainingNOfMines == 0) {
-                                        setBlocked(true);
-                                        createGameResultStage(true);
-                                    }
-                                }
-                            }
-                        }
-                        setRemainingNOfMarksLabel(remainingNOfMarks);
+                    if (cell.isMarked()) {
+                        cell.setMarked(false);
+                        remainingNOfMarks++;
                     }
-                });
+
+                    if (cell.isMined()) {
+                        openAll();
+                        setBlocked(true);
+                        createGameResultStage(false);
+                    }
+
+                    openWithNeighbors(cell);
+                }
+
+                if (t.isSecondaryButtonDown()) {
+
+                    if (cell.isMarked()) {
+                        cell.setMarked(false);
+                        remainingNOfMarks++;
+                        if (cell.isMined()) {
+                            remainingNOfMines++;
+                        }
+                    }
+
+                    else if (remainingNOfMarks > 0) {
+                        cell.setMarked(true);
+                        remainingNOfMarks--;
+                        if (cell.isMined()) {
+                            remainingNOfMines--;
+                            if (remainingNOfMines == 0) {
+                                setBlocked(true);
+                                createGameResultStage(true);
+                            }
+                        }
+                    }
+                }
+                setRemainingNOfMarksLabel(remainingNOfMarks);
             }
-        }
+        });
     }
 
     private void findNeighbors() {
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                Cell cell = field.get(i).get(j);
-                List<Cell> neighbors = getNeighbors(cell);
-                for (Cell neighbor : neighbors) {
-                    if (neighbor.isMined()) {
-                        cell.incNOfNeighbors();
-                    }
+        field.forEach(cells -> cells.forEach(cell -> {
+            List<Cell> neighbors = getNeighbors(cell);
+            for (Cell neighbor : neighbors) {
+                if (neighbor.isMined()) {
+                    cell.incNOfNeighbors();
                 }
             }
-        }
+        }));
     }
 
     private void setMines() {
@@ -238,11 +220,14 @@ class Game {
                 Cell cell = new Cell((i + 0.5 * (j % 2)) * sideLength * sqrt(3), j * sideLength * 1.5, sideLength);
                 cell.setIndexX(i);
                 cell.setIndexY(j);
+                addMouseListener(cell);
                 row.add(cell);
 
-                group.getChildren().add(cell.getHexagon());
-                group.getChildren().add(cell.getNOfNeighborsLabel());
-                group.getChildren().add(cell.getActionListenerHexagon());
+                group.getChildren().addAll(
+                    cell.getHexagon(),
+                    cell.getNOfNeighborsLabel(),
+                    cell.getActionListenerHexagon()
+                );
             }
             field.add(row);
         }
