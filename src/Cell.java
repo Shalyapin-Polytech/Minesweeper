@@ -12,6 +12,7 @@ class Cell {
     private int nOfNeighbors = 0;
     private Label nOfNeighborsLabel = new Label();
     private Polygon hexagon = new Polygon();
+    private Polygon actionListenerHexagon = new Polygon();
     private static final Color CLOSED_CELL = Color.rgb(128, 128, 128);
     private static final Color OPENED_EMPTY_CELL = Color.rgb(253, 234, 168);
     private static final Color OPENED_MINED_CELL = Color.rgb(220, 20, 60);
@@ -46,6 +47,10 @@ class Cell {
 
     Label getNOfNeighborsLabel() {
         return nOfNeighborsLabel;
+    }
+
+    Polygon getActionListenerHexagon() {
+        return actionListenerHexagon;
     }
 
     void incNOfNeighbors() {
@@ -127,6 +132,9 @@ class Cell {
             hexagon.getPoints().add(coordX + _sideLength * cos((2 * i + 1) * PI / 6));
             hexagon.getPoints().add(coordY + _sideLength * sin((2 * i + 1) * PI / 6));
         }
+
+        actionListenerHexagon.getPoints().addAll(hexagon.getPoints());
+        actionListenerHexagon.setFill(Color.TRANSPARENT);
 
         setColor();
         setNOfNeighbors();

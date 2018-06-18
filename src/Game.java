@@ -152,7 +152,7 @@ class Game {
             for (int j = 0; j < height; j++) {
 
                 Cell cell = field.get(i).get(j);
-                cell.getNOfNeighborsLabel().setOnMousePressed(t -> {
+                cell.getActionListenerHexagon().setOnMousePressed(t -> {
 
                     if (!blocked) {
 
@@ -242,6 +242,7 @@ class Game {
 
                 group.getChildren().add(cell.getHexagon());
                 group.getChildren().add(cell.getNOfNeighborsLabel());
+                group.getChildren().add(cell.getActionListenerHexagon());
             }
             field.add(row);
         }
