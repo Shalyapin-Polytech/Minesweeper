@@ -2,7 +2,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
-import javafx.scene.text.*;
+import javafx.scene.text.Font;
 import static java.lang.Math.*;
 
 class Cell {
@@ -52,8 +52,8 @@ class Cell {
         return actionListenerHexagon;
     }
 
-    void incNOfNeighbors() {
-        nOfNeighbors++;
+    void setNOfNeighbors(int nOfNeighbors) {
+        this.nOfNeighbors = nOfNeighbors;
     }
 
     int getNOfNeighbors() {
@@ -71,8 +71,8 @@ class Cell {
     void setOpened() {
         opened = true;
         marked = false;
-        setColor();
-        setNOfNeighbors();
+        recolor();
+        overwriteNOfNeighborsLabel();
     }
 
     boolean isOpened() {
@@ -81,8 +81,8 @@ class Cell {
 
     void setMarked(boolean marked) {
         this.marked = marked;
-        setColor();
-        setNOfNeighbors();
+        recolor();
+        overwriteNOfNeighborsLabel();
     }
 
     boolean isMarked() {
@@ -93,12 +93,12 @@ class Cell {
         opened = false;
         mined = false;
         marked = false;
-        setColor();
+        recolor();
         nOfNeighbors = 0;
-        setNOfNeighbors();
+        overwriteNOfNeighborsLabel();
     }
 
-    private void setColor() {
+    private void recolor() {
         if (!marked) {
             if (opened) {
                 if (mined) {
@@ -116,7 +116,7 @@ class Cell {
         }
     }
 
-    private void setNOfNeighbors() {
+    private void overwriteNOfNeighborsLabel() {
         if (opened && !mined && !marked && nOfNeighbors > 0) {
             nOfNeighborsLabel.setText(String.valueOf(nOfNeighbors));
         }
@@ -135,8 +135,8 @@ class Cell {
         actionListenerHexagon.getPoints().addAll(hexagon.getPoints());
         actionListenerHexagon.setFill(Color.TRANSPARENT);
 
-        setColor();
-        setNOfNeighbors();
+        recolor();
+        overwriteNOfNeighborsLabel();
 
         nOfNeighborsLabel.setLayoutX(coordX - sideLength * sqrt(3) / 2);
         nOfNeighborsLabel.setLayoutY(coordY - sideLength);

@@ -186,7 +186,7 @@ class Game {
             List<Cell> neighbors = getNeighbors(cell);
             for (Cell neighbor : neighbors) {
                 if (neighbor.isMined()) {
-                    cell.incNOfNeighbors();
+                    cell.setNOfNeighbors(cell.getNOfNeighbors() + 1);
                 }
             }
         }));
