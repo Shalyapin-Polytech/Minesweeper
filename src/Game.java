@@ -143,27 +143,20 @@ class Game {
 
     private void addMouseListener(Cell cell) {
         cell.getActionListenerHexagon().setOnMousePressed(t -> {
-
             if (!blocked) {
-
                 if (t.isPrimaryButtonDown()) {
-
                     if (cell.isMarked()) {
                         cell.setMarked(false);
                         remainingNOfMarks++;
                     }
-
                     if (cell.isMined()) {
                         openAll();
                         setBlocked(true);
                         createGameResultStage(false);
                     }
-
                     openWithNeighbors(cell);
                 }
-
                 if (t.isSecondaryButtonDown()) {
-
                     if (cell.isMarked()) {
                         cell.setMarked(false);
                         remainingNOfMarks++;
@@ -171,7 +164,6 @@ class Game {
                             remainingNOfMines++;
                         }
                     }
-
                     else if (remainingNOfMarks > 0) {
                         cell.setMarked(true);
                         remainingNOfMarks--;
@@ -204,13 +196,12 @@ class Game {
         remainingNOfMarks = nOfMines;
         remainingNOfMines = nOfMines;
         setRemainingNOfMarksLabel(remainingNOfMarks);
-        int _nOfMines = nOfMines;
-        while (_nOfMines > 0) {
+        for (int i = nOfMines; i > 0;) {
             int randWidth = new Random().nextInt(width);
             int randHeight = new Random().nextInt(height);
             if (!field.get(randWidth).get(randHeight).isMined()) {
                 field.get(randWidth).get(randHeight).setMined();
-                _nOfMines--;
+                i--;
             }
         }
     }
@@ -220,7 +211,11 @@ class Game {
         for (int i = 0; i < width; i++) {
             List<Cell> row = new ArrayList<>();
             for (int j = 0; j < height; j++) {
-                Cell cell = new Cell((i + 0.5 * (j % 2)) * sideLength * sqrt(3), j * sideLength * 1.5, sideLength);
+                Cell cell = new Cell(
+                    (i + 0.5 * (j % 2)) * sideLength * sqrt(3),
+                    j * sideLength * 1.5,
+                    sideLength
+                );
                 cell.setIndexX(i);
                 cell.setIndexY(j);
                 addMouseListener(cell);

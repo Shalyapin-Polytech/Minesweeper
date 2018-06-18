@@ -126,10 +126,10 @@ class Cell {
     }
 
     private void createCell(double coordX, double coordY, double sideLength) {
-        double _sideLength = sideLength * 0.95;
+        sideLength = sideLength * 0.95;
         for (int i = 0; i < 6; i++) {
-            hexagon.getPoints().add(coordX + _sideLength * cos((2 * i + 1) * PI / 6));
-            hexagon.getPoints().add(coordY + _sideLength * sin((2 * i + 1) * PI / 6));
+            hexagon.getPoints().add(coordX + sideLength * cos((2 * i + 1) * PI / 6));
+            hexagon.getPoints().add(coordY + sideLength * sin((2 * i + 1) * PI / 6));
         }
 
         actionListenerHexagon.getPoints().addAll(hexagon.getPoints());
@@ -138,11 +138,11 @@ class Cell {
         setColor();
         setNOfNeighbors();
 
-        nOfNeighborsLabel.setLayoutX(coordX - _sideLength * sqrt(3) / 2);
-        nOfNeighborsLabel.setLayoutY(coordY - _sideLength);
-        nOfNeighborsLabel.setMinWidth(_sideLength * sqrt(3));
-        nOfNeighborsLabel.setMinHeight(_sideLength * 2);
-        nOfNeighborsLabel.setFont(new Font(_sideLength));
+        nOfNeighborsLabel.setLayoutX(coordX - sideLength * sqrt(3) / 2);
+        nOfNeighborsLabel.setLayoutY(coordY - sideLength);
+        nOfNeighborsLabel.setMinWidth(sideLength * sqrt(3));
+        nOfNeighborsLabel.setMinHeight(sideLength * 2);
+        nOfNeighborsLabel.setFont(new Font(sideLength));
         nOfNeighborsLabel.setAlignment(Pos.CENTER);
     }
 }
