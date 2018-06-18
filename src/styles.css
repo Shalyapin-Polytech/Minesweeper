@@ -10,7 +10,8 @@
     -fx-font-size: 1.5em;
 }
 
-.button, .toggle-button {
+.button,
+.toggle-button {
     -fx-font-family: 'sans-serif';
     -fx-padding: 1em;
     -fx-background-color: #ffffff;
@@ -20,7 +21,8 @@
     -fx-border-radius: 3;
 }
 
-.button:hover, .toggle-button:hover {
+.button:hover,
+.toggle-button:hover {
     -fx-background-color: #f3f3f3;
 }
 
