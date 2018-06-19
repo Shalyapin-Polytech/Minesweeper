@@ -57,6 +57,9 @@ public class Main extends Application {
         mainMenuPane.setAlignment(Pos.TOP_LEFT);
         mainMenuPane.getStyleClass().add("main-menu-pane");
 
+        GridPane mainButtonsPane = new GridPane();
+        mainButtonsPane.setHgap(40);
+
         Button startButton = new Button("Новая игра");
         Button continueButton = new Button("Продолжить");
         Button exitButton = new Button("Выход");
@@ -66,17 +69,21 @@ public class Main extends Application {
             continueButton.setDisable(false);
             primaryStage.setScene(gameScene);
         });
-        mainMenuPane.add(startButton, 0, 0);
+        mainButtonsPane.add(startButton, 0, 0);
 
         continueButton.setDisable(true);
         continueButton.setOnAction(event -> primaryStage.setScene(gameScene));
-        mainMenuPane.add(continueButton, 0, 1);
+        mainButtonsPane.add(continueButton, 1, 0);
 
         exitButton.setOnAction(event -> System.exit(0));
-        mainMenuPane.add(exitButton, 0, 3);
+        mainButtonsPane.add(exitButton, 2, 0);
 
         GridPane chooseModePane = new GridPane();
-        chooseModePane.setHgap(50);
+        chooseModePane.setHgap(30);
+        chooseModePane.getStyleClass().add("choose-mode-pane");
+
+        Label choiceModeAnnotation = new Label("Уровень сложности:");
+        chooseModePane.add(choiceModeAnnotation, 0, 0);
 
         ToggleGroup choiceMode = new ToggleGroup();
 
@@ -87,26 +94,36 @@ public class Main extends Application {
         easyModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
             game.setGameMode("easy");
+            if (!easyModeItem.isSelected()) {
+                game.setGameMode(null);
+            }
         });
         easyModeItem.setToggleGroup(choiceMode);
-        chooseModePane.add(easyModeItem, 0, 0);
+        chooseModePane.add(easyModeItem, 1, 0);
 
 
         mediumModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
             game.setGameMode("medium");
+            if (!easyModeItem.isSelected()) {
+                game.setGameMode(null);
+            }
         });
         mediumModeItem.setToggleGroup(choiceMode);
-        chooseModePane.add(mediumModeItem, 1, 0);
+        chooseModePane.add(mediumModeItem, 2, 0);
 
         hardModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
             game.setGameMode("hard");
+            if (!easyModeItem.isSelected()) {
+                game.setGameMode(null);
+            }
         });
         hardModeItem.setToggleGroup(choiceMode);
-        chooseModePane.add(hardModeItem, 2, 0);
+        chooseModePane.add(hardModeItem, 3, 0);
 
-        mainMenuPane.add(chooseModePane, 0, 2);
+        mainMenuPane.add(mainButtonsPane, 0, 0);
+        mainMenuPane.add(chooseModePane, 0, 1);
 
         Scene menuScene = new Scene(mainMenuPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         menuScene.getStylesheets().add("styles.css");
