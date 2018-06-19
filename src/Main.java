@@ -80,7 +80,7 @@ public class Main extends Application {
 
         GridPane chooseModePane = new GridPane();
         chooseModePane.setHgap(30);
-        chooseModePane.getStyleClass().add("choose-mode-pane");
+        chooseModePane.getStyleClass().add("choose-pane");
 
         Label choiceModeAnnotation = new Label("Уровень сложности:");
         chooseModePane.add(choiceModeAnnotation, 0, 0);
@@ -100,7 +100,6 @@ public class Main extends Application {
         });
         easyModeItem.setToggleGroup(choiceMode);
         chooseModePane.add(easyModeItem, 1, 0);
-
 
         mediumModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
@@ -122,8 +121,32 @@ public class Main extends Application {
         hardModeItem.setToggleGroup(choiceMode);
         chooseModePane.add(hardModeItem, 3, 0);
 
+        GridPane chooseWidthPane = new GridPane();
+        chooseWidthPane.setHgap(30);
+        chooseWidthPane.getStyleClass().add("choose-pane");
+
+        Label choiceWidthAnnotation = new Label("Ширина поля:");
+
+        Label sliderValueLabel = new Label();
+
+        Slider widthSlider = new Slider(30, 40, 1);
+        widthSlider.setBlockIncrement(1);
+        widthSlider.setValue(36);
+        sliderValueLabel.setText(String.valueOf((int) widthSlider.getValue()));
+        widthSlider.setShowTickLabels(true);
+        widthSlider.setShowTickMarks(true);
+        widthSlider.valueProperty().addListener(t -> {
+            game.setWidth((int) widthSlider.getValue());
+            sliderValueLabel.setText(String.valueOf((int) widthSlider.getValue()));
+        });
+
+        chooseWidthPane.add(choiceWidthAnnotation, 0, 0);
+        chooseWidthPane.add(widthSlider, 1, 0);
+        chooseWidthPane.add(sliderValueLabel, 2, 0);
+
         mainMenuPane.add(mainButtonsPane, 0, 0);
         mainMenuPane.add(chooseModePane, 0, 1);
+        mainMenuPane.add(chooseWidthPane, 0, 2);
 
         Scene menuScene = new Scene(mainMenuPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         menuScene.getStylesheets().add("styles.css");

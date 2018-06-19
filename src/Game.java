@@ -18,9 +18,6 @@ class Game {
     private int remainingNOfMarks, remainingNOfMines = 0;
 
     Game() {
-        width = 36;
-        height = (int) ((width / Main.ASPECT_RATIO) * (2.0 / sqrt(3)) * 0.9);
-
         createField();
         setMines();
         findNeighbors();
@@ -40,6 +37,12 @@ class Game {
 
     private void setBlocked(boolean blocked) {
         this.blocked = blocked;
+    }
+
+    void setWidth(int width) {
+        this.width = width;
+        clearField();
+        createField();
     }
 
     void setGameMode(String gameMode) {
@@ -205,14 +208,17 @@ class Game {
         for (int i = nOfMines; i > 0;) {
             int randWidth = new Random().nextInt(width);
             int randHeight = new Random().nextInt(height);
-            if (!field.get(randWidth).get(randHeight).isMined()) {
-                field.get(randWidth).get(randHeight).setMined();
+            Cell randCell = field.get(randWidth).get(randHeight);
+            if (!randCell.isMined()) {
+                randCell.setMined();
                 i--;
             }
         }
     }
 
     private void createField() {
+        height = (int) ((width / Main.ASPECT_RATIO) * (2.0 / sqrt(3)) * 0.9);
+
         double sideLength = Main.WINDOW_WIDTH * 0.8 / ( sqrt(3) * width );
         for (int i = 0; i < width; i++) {
             List<Cell> row = new ArrayList<>();
@@ -235,5 +241,10 @@ class Game {
             }
             field.add(row);
         }
+    }
+
+    private void clearField() {
+        field.clear();
+        group.getChildren().clear();
     }
 }

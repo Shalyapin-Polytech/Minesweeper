@@ -6,7 +6,7 @@
     -fx-font-size: 3em;
 }
 
-.main-menu-pane .choose-mode-pane {
+.main-menu-pane .choose-pane {
     -fx-font-size: 1.5em;
 }
 
@@ -28,6 +28,14 @@
 
 .toggle-button:selected {
     -fx-background-color: #d3d3d3;
+}
+
+.slider .thumb {
+    -fx-background-color: #ffffff;
+    -fx-pref-height: 30;
+    -fx-pref-width: 30;
+    -fx-border-radius: 10;
+    -fx-border-color: #a2a9b1;
 }
 
 .result-pane {
