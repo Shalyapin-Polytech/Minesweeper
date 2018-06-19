@@ -129,10 +129,8 @@ public class Main extends Application {
         Slider widthSlider = new Slider();
         widthSlider.setMin(30);
         widthSlider.setMax(40);
-        //widthSlider.setBlockIncrement(1);
         widthSlider.setValue(36);
         widthSlider.setShowTickLabels(true);
-        //widthSlider.setShowTickMarks(true);
         widthSlider.setMinWidth(350);
         game.setWidth((int) widthSlider.getValue());
         sliderValueLabel.setText(String.valueOf((int) widthSlider.getValue()));
