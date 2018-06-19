@@ -78,12 +78,13 @@ public class Main extends Application {
         exitButton.setOnAction(event -> System.exit(0));
         mainButtonsPane.add(exitButton, 2, 0);
 
-        GridPane chooseModePane = new GridPane();
-        chooseModePane.setHgap(30);
-        chooseModePane.getStyleClass().add("choose-pane");
+        GridPane choosePane = new GridPane();
+        choosePane.setHgap(30);
+        choosePane.setVgap(30);
+        choosePane.getStyleClass().add("choose-pane");
 
         Label choiceModeAnnotation = new Label("Уровень сложности:");
-        chooseModePane.add(choiceModeAnnotation, 0, 0);
+        choosePane.add(choiceModeAnnotation, 0, 0);
 
         ToggleGroup choiceMode = new ToggleGroup();
 
@@ -99,7 +100,7 @@ public class Main extends Application {
             }
         });
         easyModeItem.setToggleGroup(choiceMode);
-        chooseModePane.add(easyModeItem, 1, 0);
+        choosePane.add(easyModeItem, 1, 0);
 
         mediumModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
@@ -109,7 +110,7 @@ public class Main extends Application {
             }
         });
         mediumModeItem.setToggleGroup(choiceMode);
-        chooseModePane.add(mediumModeItem, 2, 0);
+        choosePane.add(mediumModeItem, 2, 0);
 
         hardModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
@@ -119,34 +120,38 @@ public class Main extends Application {
             }
         });
         hardModeItem.setToggleGroup(choiceMode);
-        chooseModePane.add(hardModeItem, 3, 0);
-
-        GridPane chooseWidthPane = new GridPane();
-        chooseWidthPane.setHgap(30);
-        chooseWidthPane.getStyleClass().add("choose-pane");
+        choosePane.add(hardModeItem, 3, 0);
 
         Label choiceWidthAnnotation = new Label("Ширина поля:");
 
         Label sliderValueLabel = new Label();
 
-        Slider widthSlider = new Slider(30, 40, 1);
-        widthSlider.setBlockIncrement(1);
+        Slider widthSlider = new Slider();
+        widthSlider.setMin(30);
+        widthSlider.setMax(40);
+        //widthSlider.setBlockIncrement(1);
         widthSlider.setValue(36);
-        sliderValueLabel.setText(String.valueOf((int) widthSlider.getValue()));
         widthSlider.setShowTickLabels(true);
-        widthSlider.setShowTickMarks(true);
+        //widthSlider.setShowTickMarks(true);
+        widthSlider.setMinWidth(350);
+        game.setWidth((int) widthSlider.getValue());
+        sliderValueLabel.setText(String.valueOf((int) widthSlider.getValue()));
         widthSlider.valueProperty().addListener(t -> {
+            continueButton.setDisable(true);
             game.setWidth((int) widthSlider.getValue());
             sliderValueLabel.setText(String.valueOf((int) widthSlider.getValue()));
         });
 
-        chooseWidthPane.add(choiceWidthAnnotation, 0, 0);
-        chooseWidthPane.add(widthSlider, 1, 0);
-        chooseWidthPane.add(sliderValueLabel, 2, 0);
+        GridPane sliderPane = new GridPane();
+        sliderPane.setHgap(30);
+        sliderPane.add(widthSlider, 0, 0);
+        sliderPane.add(sliderValueLabel, 1, 0);
+
+        choosePane.add(choiceWidthAnnotation, 0, 1);
+        choosePane.add(sliderPane, 1, 1, 3, 1);
 
         mainMenuPane.add(mainButtonsPane, 0, 0);
-        mainMenuPane.add(chooseModePane, 0, 1);
-        mainMenuPane.add(chooseWidthPane, 0, 2);
+        mainMenuPane.add(choosePane, 0, 1);
 
         Scene menuScene = new Scene(mainMenuPane, WINDOW_WIDTH, WINDOW_HEIGHT);
         menuScene.getStylesheets().add("styles.css");
