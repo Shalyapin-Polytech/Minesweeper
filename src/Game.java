@@ -12,10 +12,11 @@ class Game {
     private List<List<Cell>> field = new ArrayList<>();
     private Group group = new Group();
     private Label remainingNOfMarksLabel = new Label();
-    private String gameMode;
-    private boolean blocked;
+    private Stage resultsStage = new Stage(StageStyle.TRANSPARENT);
     private int width, height;
+    private String gameMode;
     private int remainingNOfMarks, remainingNOfMines = 0;
+    private boolean blocked;
 
     Game() {
         createField();
@@ -106,8 +107,6 @@ class Game {
     }
 
     private void createGameResultStage(boolean win) {
-        Stage resultStage = new Stage(StageStyle.TRANSPARENT);
-
         Text resultText = new Text();
         if (win) {
             resultText.setText("Вы выиграли");
@@ -116,20 +115,24 @@ class Game {
             resultText.setText("Вы проиграли");
         }
 
-        HBox resultPane = new HBox();
-        resultPane.setMinWidth(500);
-        resultPane.setMinHeight(500 / Main.ASPECT_RATIO);
-        resultPane.getChildren().add(resultText);
-        resultPane.setAlignment(Pos.CENTER);
-        resultPane.getStyleClass().add("result-pane");
-        resultPane.setOnMouseClicked(t -> resultStage.close());
+        HBox resultsPane = new HBox();
+        resultsPane.setMinWidth(500);
+        resultsPane.setMinHeight(500 / Main.ASPECT_RATIO);
+        resultsPane.getChildren().add(resultText);
+        resultsPane.setAlignment(Pos.CENTER);
+        resultsPane.getStyleClass().add("result-pane");
+        resultsPane.setOnMouseClicked(t -> resultsStage.close());
 
-        Scene resultScene = new Scene(resultPane);
-        resultScene.getStylesheets().add("styles.css");
-        resultScene.setFill(Color.TRANSPARENT);
+        Scene resultsScene = new Scene(resultsPane);
+        resultsScene.getStylesheets().add("styles.css");
+        resultsScene.setFill(Color.TRANSPARENT);
 
-        resultStage.setScene(resultScene);
-        resultStage.show();
+        resultsStage.setScene(resultsScene);
+        resultsStage.show();
+    }
+
+    void closeGameResultStage() {
+        resultsStage.close();
     }
 
     private void addMouseListener(Cell cell) {

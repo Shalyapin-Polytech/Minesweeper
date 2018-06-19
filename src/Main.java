@@ -23,7 +23,10 @@ public class Main extends Application {
         gameMenuPane.getStyleClass().add("game-menu-pane");
 
         Button restartButton = new Button("Новая игра");
-        restartButton.setOnAction(event -> game.restart());
+        restartButton.setOnAction(event -> {
+            game.closeGameResultStage();
+            game.restart();
+        });
         gameMenuPane.getChildren().add(restartButton);
 
         Button openAllButton = new Button("Открыть все");
@@ -31,7 +34,10 @@ public class Main extends Application {
         gameMenuPane.getChildren().add(openAllButton);
 
         Button exitToMenuButton = new Button("Выход в меню");
-        exitToMenuButton.setOnAction(event -> primaryStage.setScene(menuScene));
+        exitToMenuButton.setOnAction(event -> {
+            game.closeGameResultStage();
+            primaryStage.setScene(menuScene);
+        });
         gameMenuPane.getChildren().add(exitToMenuButton);
 
         gameMenuPane.getChildren().add(game.getRemainingNOfMarksLabel());
