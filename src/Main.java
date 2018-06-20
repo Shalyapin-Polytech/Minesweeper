@@ -6,15 +6,14 @@ import javafx.scene.layout.*;
 import javafx.stage.*;
 
 public class Main extends Application {
-    private Game game = new Game();
+    private static final Rectangle2D VISUAL_BOUNDS = Screen.getPrimary().getVisualBounds();
+    private static final double WINDOW_WIDTH = VISUAL_BOUNDS.getWidth();
+    private static final double WINDOW_HEIGHT = VISUAL_BOUNDS.getHeight();
+
+    private Game game = new Game(WINDOW_WIDTH * 0.8, WINDOW_HEIGHT * 0.8 * 0.9);
     private Stage primaryStage;
     private Scene menuScene = createMenuScene();
     private Scene gameScene = createGameScene();
-
-    private static final Rectangle2D VISUAL_BOUNDS = Screen.getPrimary().getVisualBounds();
-    static final double WINDOW_WIDTH = VISUAL_BOUNDS.getWidth();
-    private static final double WINDOW_HEIGHT = VISUAL_BOUNDS.getHeight();
-    static final double ASPECT_RATIO = WINDOW_WIDTH / WINDOW_HEIGHT;
 
     private Scene createGameScene() {
         HBox gameMenuPane = new HBox();
@@ -40,6 +39,8 @@ public class Main extends Application {
         });
         gameMenuPane.getChildren().add(exitToMenuButton);
 
+        Label remainingNOfMarksLabel = new Label();
+        //remainingNOfMarksLabel.addEventHandler();
         gameMenuPane.getChildren().add(game.getRemainingNOfMarksLabel());
 
         GridPane gamePane = new GridPane();

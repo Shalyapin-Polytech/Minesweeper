@@ -13,12 +13,16 @@ class Game {
     private Group group = new Group();
     private Label remainingNOfMarksLabel = new Label();
     private Stage resultsStage = new Stage(StageStyle.TRANSPARENT);
+    private double windowWidth, windowHeight;
     private int width, height;
     private String gameMode;
     private int remainingNOfMarks, remainingNOfMines = 0;
     private boolean blocked;
 
-    Game() {
+    Game(double windowWidth, double windowHeight) {
+        this.windowWidth = windowWidth;
+        this.windowHeight = windowHeight;
+
         createField();
         setMines();
         findNeighbors();
@@ -116,8 +120,9 @@ class Game {
         }
 
         HBox resultsPane = new HBox();
+        double aspectRatio = windowWidth / windowHeight;
         resultsPane.setMinWidth(500);
-        resultsPane.setMinHeight(500 / Main.ASPECT_RATIO);
+        resultsPane.setMinHeight(500 / aspectRatio);
         resultsPane.getChildren().add(resultText);
         resultsPane.setAlignment(Pos.CENTER);
         resultsPane.getStyleClass().add("result-pane");
@@ -220,9 +225,10 @@ class Game {
     }
 
     private void createField() {
-        height = (int) ((width / Main.ASPECT_RATIO) * (2.0 / sqrt(3)) * 0.9);
+        double aspectRatio = windowWidth / windowHeight;
+        height = (int) ((width / aspectRatio) * (2.0 / sqrt(3)));
 
-        double sideLength = Main.WINDOW_WIDTH * 0.8 / ( sqrt(3) * width );
+        double sideLength = windowWidth / ( sqrt(3) * width );
         for (int i = 0; i < width; i++) {
             List<Cell> row = new ArrayList<>();
             for (int j = 0; j < height; j++) {
