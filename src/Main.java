@@ -39,9 +39,8 @@ public class Main extends Application {
         });
         gameMenuPane.getChildren().add(exitToMenuButton);
 
-        Label remainingNOfMarksLabel = new Label();
-        //remainingNOfMarksLabel.addEventHandler();
-        gameMenuPane.getChildren().add(game.getRemainingNOfMarksLabel());
+        Label remainingNOfMarksLabel = game.getRemainingNOfMarksLabel();
+        gameMenuPane.getChildren().add(remainingNOfMarksLabel);
 
         GridPane gamePane = new GridPane();
         gamePane.setPadding(new Insets(50));
