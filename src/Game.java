@@ -1,18 +1,10 @@
 import java.util.*;
-import javafx.geometry.Pos;
 import javafx.scene.*;
-import javafx.scene.control.Label;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.*;
-import javafx.stage.*;
 import static java.lang.StrictMath.sqrt;
 
 class Game {
     private List<List<Cell>> field = new ArrayList<>();
     private Group group = new Group();
-    private Label remainingNOfMarksLabel = new Label();
-    private Stage resultsStage = new Stage(StageStyle.TRANSPARENT);
     private double windowWidth, windowHeight;
     private int width, height;
     private String gameMode;
@@ -30,14 +22,6 @@ class Game {
 
     Group getGroup() {
         return group;
-    }
-
-    private void setRemainingNOfMarksLabel(int remainingNOfMines) {
-        remainingNOfMarksLabel.setText(String.valueOf(remainingNOfMines));
-    }
-
-    Label getRemainingNOfMarksLabel() {
-        return remainingNOfMarksLabel;
     }
 
     private void setBlocked(boolean blocked) {
@@ -110,36 +94,6 @@ class Game {
         }
     }
 
-    private void createGameResultStage(boolean win) {
-        Text resultText = new Text();
-        if (win) {
-            resultText.setText("Вы выиграли");
-        }
-        else {
-            resultText.setText("Вы проиграли");
-        }
-
-        HBox resultsPane = new HBox();
-        double aspectRatio = windowWidth / windowHeight;
-        resultsPane.setMinWidth(500);
-        resultsPane.setMinHeight(500 / aspectRatio);
-        resultsPane.getChildren().add(resultText);
-        resultsPane.setAlignment(Pos.CENTER);
-        resultsPane.getStyleClass().add("result-pane");
-        resultsPane.setOnMouseClicked(t -> resultsStage.close());
-
-        Scene resultsScene = new Scene(resultsPane);
-        resultsScene.getStylesheets().add("styles.css");
-        resultsScene.setFill(Color.TRANSPARENT);
-
-        resultsStage.setScene(resultsScene);
-        resultsStage.show();
-    }
-
-    void closeGameResultStage() {
-        resultsStage.close();
-    }
-
     private void addMouseListener(Cell cell) {
         cell.getActionListenerHexagon().setOnMousePressed(t -> {
             if (!blocked) {
@@ -151,7 +105,7 @@ class Game {
                     if (cell.isMined()) {
                         openAll();
                         setBlocked(true);
-                        createGameResultStage(false);
+                        Menu.createGameResultStage(false);
                     }
                     openWithNeighbors(cell);
                 }
@@ -170,12 +124,12 @@ class Game {
                             remainingNOfMines--;
                             if (remainingNOfMines == 0) {
                                 setBlocked(true);
-                                createGameResultStage(true);
+                                Menu.createGameResultStage(true);
                             }
                         }
                     }
                 }
-                setRemainingNOfMarksLabel(remainingNOfMarks);
+                Menu.setRemainingNOfMarksLabel(remainingNOfMarks);
             }
         });
     }
@@ -212,7 +166,7 @@ class Game {
         int nOfMines = (int) (nOfCells * proportionOfMines);
         remainingNOfMarks = nOfMines;
         remainingNOfMines = nOfMines;
-        setRemainingNOfMarksLabel(remainingNOfMarks);
+        Menu.setRemainingNOfMarksLabel(remainingNOfMarks);
         for (int i = nOfMines; i > 0;) {
             int randWidth = new Random().nextInt(width);
             int randHeight = new Random().nextInt(height);

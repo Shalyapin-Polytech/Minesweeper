@@ -3,17 +3,58 @@ import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.*;
 
-public class Main extends Application {
+public class Menu extends Application {
     private static final Rectangle2D VISUAL_BOUNDS = Screen.getPrimary().getVisualBounds();
     private static final double WINDOW_WIDTH = VISUAL_BOUNDS.getWidth();
     private static final double WINDOW_HEIGHT = VISUAL_BOUNDS.getHeight();
 
     private Game game = new Game(WINDOW_WIDTH * 0.8, WINDOW_HEIGHT * 0.8 * 0.9);
     private Stage primaryStage;
+    private static Stage resultsStage;
     private Scene menuScene = createMenuScene();
     private Scene gameScene = createGameScene();
+    private static Label remainingNOfMarksLabel = new Label();
+
+    static void setRemainingNOfMarksLabel(int remainingNOfMarks) {
+        remainingNOfMarksLabel.setText(String.valueOf(remainingNOfMarks));
+    }
+
+    static void createGameResultStage(boolean win) {
+        resultsStage = new Stage(StageStyle.TRANSPARENT);
+        Text resultText = new Text();
+        if (win) {
+            resultText.setText("Вы выиграли");
+        }
+        else {
+            resultText.setText("Вы проиграли");
+        }
+
+        HBox resultsPane = new HBox();
+        double aspectRatio = WINDOW_WIDTH / WINDOW_HEIGHT;
+        resultsPane.setMinWidth(500);
+        resultsPane.setMinHeight(500 / aspectRatio);
+        resultsPane.getChildren().add(resultText);
+        resultsPane.setAlignment(Pos.CENTER);
+        resultsPane.getStyleClass().add("result-pane");
+        resultsPane.setOnMouseClicked(t -> resultsStage.close());
+
+        Scene resultsScene = new Scene(resultsPane);
+        resultsScene.getStylesheets().add("styles.css");
+        resultsScene.setFill(Color.TRANSPARENT);
+
+        resultsStage.setScene(resultsScene);
+        resultsStage.show();
+    }
+
+    private static void closeGameResultStage() {
+        if (resultsStage != null) {
+            resultsStage.close();
+        }
+    }
 
     private Scene createGameScene() {
         HBox gameMenuPane = new HBox();
@@ -23,7 +64,7 @@ public class Main extends Application {
 
         Button restartButton = new Button("Новая игра");
         restartButton.setOnAction(event -> {
-            game.closeGameResultStage();
+            closeGameResultStage();
             game.restart();
         });
         gameMenuPane.getChildren().add(restartButton);
@@ -34,12 +75,11 @@ public class Main extends Application {
 
         Button exitToMenuButton = new Button("Выход в меню");
         exitToMenuButton.setOnAction(event -> {
-            game.closeGameResultStage();
+            closeGameResultStage();
             primaryStage.setScene(menuScene);
         });
         gameMenuPane.getChildren().add(exitToMenuButton);
 
-        Label remainingNOfMarksLabel = game.getRemainingNOfMarksLabel();
         gameMenuPane.getChildren().add(remainingNOfMarksLabel);
 
         GridPane gamePane = new GridPane();
@@ -111,7 +151,7 @@ public class Main extends Application {
         mediumModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
             game.setGameMode("medium");
-            if (!easyModeItem.isSelected()) {
+            if (!mediumModeItem.isSelected()) {
                 game.setGameMode(null);
             }
         });
@@ -121,7 +161,7 @@ public class Main extends Application {
         hardModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
             game.setGameMode("hard");
-            if (!easyModeItem.isSelected()) {
+            if (!hardModeItem.isSelected()) {
                 game.setGameMode(null);
             }
         });
