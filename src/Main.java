@@ -7,7 +7,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.*;
 
-public class Menu extends Application {
+public class Main extends Application {
     private static final Rectangle2D VISUAL_BOUNDS = Screen.getPrimary().getVisualBounds();
     private static final double WINDOW_WIDTH = VISUAL_BOUNDS.getWidth();
     private static final double WINDOW_HEIGHT = VISUAL_BOUNDS.getHeight();

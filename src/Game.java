@@ -105,7 +105,7 @@ class Game {
                     if (cell.isMined()) {
                         openAll();
                         setBlocked(true);
-                        Menu.createGameResultStage(false);
+                        Main.createGameResultStage(false);
                     }
                     openWithNeighbors(cell);
                 }
@@ -124,12 +124,12 @@ class Game {
                             remainingNOfMines--;
                             if (remainingNOfMines == 0) {
                                 setBlocked(true);
-                                Menu.createGameResultStage(true);
+                                Main.createGameResultStage(true);
                             }
                         }
                     }
                 }
-                Menu.setRemainingNOfMarksLabel(remainingNOfMarks);
+                Main.setRemainingNOfMarksLabel(remainingNOfMarks);
             }
         });
     }
@@ -166,7 +166,7 @@ class Game {
         int nOfMines = (int) (nOfCells * proportionOfMines);
         remainingNOfMarks = nOfMines;
         remainingNOfMines = nOfMines;
-        Menu.setRemainingNOfMarksLabel(remainingNOfMarks);
+        Main.setRemainingNOfMarksLabel(remainingNOfMarks);
         for (int i = nOfMines; i > 0;) {
             int randWidth = new Random().nextInt(width);
             int randHeight = new Random().nextInt(height);
