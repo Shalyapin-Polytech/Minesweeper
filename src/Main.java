@@ -97,6 +97,10 @@ public class Main extends Application {
     }
 
     private Scene createMenuScene() {
+        final int MIN_WIDTH = 30;
+        final int MAX_WIDTH = 40;
+        final int DEFAULT_WIDTH = 36;
+
         GridPane mainMenuPane = new GridPane();
         mainMenuPane.setPadding(new Insets(200));
         mainMenuPane.setVgap(40);
@@ -173,17 +177,19 @@ public class Main extends Application {
         Label sliderValueLabel = new Label();
 
         Slider widthSlider = new Slider();
-        widthSlider.setMin(30);
-        widthSlider.setMax(40);
-        widthSlider.setValue(36);
+        widthSlider.setMin(MIN_WIDTH);
+        widthSlider.setMax(MAX_WIDTH);
+        widthSlider.setValue(DEFAULT_WIDTH);
         widthSlider.setShowTickLabels(true);
         widthSlider.setMinWidth(350);
-        game.setWidth((int) widthSlider.getValue());
-        sliderValueLabel.setText(String.valueOf((int) widthSlider.getValue()));
+
+        game.setWidth(DEFAULT_WIDTH);
+        sliderValueLabel.setText(String.valueOf(DEFAULT_WIDTH));
         widthSlider.valueProperty().addListener(t -> {
             continueButton.setDisable(true);
-            game.setWidth((int) widthSlider.getValue());
-            sliderValueLabel.setText(String.valueOf((int) widthSlider.getValue()));
+            final int width = (int) widthSlider.getValue();
+            game.setWidth(width);
+            sliderValueLabel.setText(String.valueOf(width));
         });
 
         GridPane sliderPane = new GridPane();

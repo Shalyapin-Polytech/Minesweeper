@@ -14,10 +14,6 @@ class Game {
     Game(double windowWidth, double windowHeight) {
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
-
-        createField();
-        setMines();
-        findNeighbors();
     }
 
     Group getGroup() {
@@ -30,17 +26,15 @@ class Game {
 
     void setWidth(int width) {
         this.width = width;
-        clearField();
-        createField();
     }
 
     void setGameMode(String gameMode) {
         this.gameMode = gameMode;
-        restart();
     }
 
     void restart() {
-        field.forEach(cells -> cells.forEach(Cell::clear));
+        clearField();
+        createField();
         setMines();
         findNeighbors();
         setBlocked(false);
