@@ -90,15 +90,6 @@ class Cell {
         return marked;
     }
 
-    void clear() {
-        opened = false;
-        mined = false;
-        marked = false;
-        recolor();
-        nOfNeighbors = 0;
-        rewriteNOfNeighborsLabel();
-    }
-
     private void recolor() {
         if (!marked) {
             if (opened) {
