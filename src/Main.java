@@ -144,7 +144,7 @@ public class Main extends Application {
 
         easyModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
-            game.setGameMode("easy");
+            game.setGameMode(GameMode.EASY);
             if (!easyModeItem.isSelected()) {
                 game.setGameMode(null);
             }
@@ -154,7 +154,7 @@ public class Main extends Application {
 
         mediumModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
-            game.setGameMode("medium");
+            game.setGameMode(GameMode.MEDIUM);
             if (!mediumModeItem.isSelected()) {
                 game.setGameMode(null);
             }
@@ -164,7 +164,7 @@ public class Main extends Application {
 
         hardModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
-            game.setGameMode("hard");
+            game.setGameMode(GameMode.HARD);
             if (!hardModeItem.isSelected()) {
                 game.setGameMode(null);
             }

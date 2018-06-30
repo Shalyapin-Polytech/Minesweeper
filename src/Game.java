@@ -7,7 +7,7 @@ class Game {
     private Group group = new Group();
     private double windowWidth, windowHeight;
     private int width, height;
-    private String gameMode;
+    private GameMode gameMode;
     private int remainingNOfMarks, remainingNOfMines = 0;
     private boolean blocked;
 
@@ -28,7 +28,7 @@ class Game {
         this.width = width;
     }
 
-    void setGameMode(String gameMode) {
+    void setGameMode(GameMode gameMode) {
         this.gameMode = gameMode;
     }
 
@@ -144,16 +144,16 @@ class Game {
         double proportionOfMines = 0;
 
         if (gameMode == null) {
-            gameMode = "medium";
+            gameMode = GameMode.MEDIUM;
         }
         switch (gameMode) {
-            case "easy":
+            case EASY:
                 proportionOfMines = 0.1;
                 break;
-            case "medium":
+            case MEDIUM:
                 proportionOfMines = 0.15;
                 break;
-            case "hard":
+            case HARD:
                 proportionOfMines = 0.18;
                 break;
         }
