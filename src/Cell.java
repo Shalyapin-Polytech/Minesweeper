@@ -10,8 +10,8 @@ class Cell {
     private Polygon actionListenerHexagon = new Polygon();
     private Label nOfNeighborsLabel = new Label();
     private int indexX, indexY;
-    private boolean mined, opened, marked;
     private int nOfNeighbors = 0;
+    private boolean mined, opened, marked;
 
     private static final Color CLOSED_CELL = Color.rgb(128, 128, 128);
     private static final Color OPENED_EMPTY_CELL = Color.rgb(253, 234, 168);
@@ -23,6 +23,18 @@ class Cell {
         this.mined = false;
 
         createCell(coordX, coordY, sideLength);
+    }
+
+    Polygon getHexagon() {
+        return hexagon;
+    }
+
+    Polygon getActionListenerHexagon() {
+        return actionListenerHexagon;
+    }
+
+    Label getNOfNeighborsLabel() {
+        return nOfNeighborsLabel;
     }
 
     void setIndexX(int indexX) {
@@ -39,18 +51,6 @@ class Cell {
 
     int getIndexY() {
         return indexY;
-    }
-
-    Polygon getHexagon() {
-        return hexagon;
-    }
-
-    Label getNOfNeighborsLabel() {
-        return nOfNeighborsLabel;
-    }
-
-    Polygon getActionListenerHexagon() {
-        return actionListenerHexagon;
     }
 
     void setNOfNeighbors(int nOfNeighbors) {

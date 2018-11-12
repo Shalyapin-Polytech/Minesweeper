@@ -20,16 +20,16 @@ class Game {
         return group;
     }
 
-    private void setBlocked(boolean blocked) {
-        this.blocked = blocked;
-    }
-
     void setWidth(int width) {
         this.width = width;
     }
 
     void setGameMode(GameMode gameMode) {
         this.gameMode = gameMode;
+    }
+
+    private void setBlocked(boolean blocked) {
+        this.blocked = blocked;
     }
 
     void restart() {
@@ -141,26 +141,14 @@ class Game {
 
     private void setMines() {
         int nOfCells = width * height;
-        double proportionOfMines = 0;
-
         if (gameMode == null) {
             gameMode = GameMode.MEDIUM;
         }
-        switch (gameMode) {
-            case EASY:
-                proportionOfMines = 0.1;
-                break;
-            case MEDIUM:
-                proportionOfMines = 0.15;
-                break;
-            case HARD:
-                proportionOfMines = 0.18;
-                break;
-        }
-        int nOfMines = (int) (nOfCells * proportionOfMines);
+        int nOfMines = (int) (nOfCells * gameMode.getProportionOfMines());
         remainingNOfMarks = nOfMines;
         remainingNOfMines = nOfMines;
         Main.setRemainingNOfMarksLabel(remainingNOfMarks);
+
         for (int i = nOfMines; i > 0;) {
             int randWidth = new Random().nextInt(width);
             int randHeight = new Random().nextInt(height);
