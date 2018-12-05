@@ -73,6 +73,10 @@ public class Main extends Application {
         openAllButton.setOnAction(event -> game.openAll());
         gameMenuPane.getChildren().add(openAllButton);
 
+        Button botActivationButton = new Button("Выпустить кракена");
+        botActivationButton.setOnAction(event -> game.subtractionMethod());
+        gameMenuPane.getChildren().add(botActivationButton);
+
         Button exitToMenuButton = new Button("Выход в меню");
         exitToMenuButton.setOnAction(event -> {
             closeGameResultStage();

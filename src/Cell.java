@@ -8,15 +8,16 @@ import static java.lang.Math.*;
 class Cell {
     private Polygon hexagon = new Polygon();
     private Polygon actionListenerHexagon = new Polygon();
-    private Label nOfNeighborsLabel = new Label();
+    private Label nOfMinedNeighborsLabel = new Label();
     private int indexX, indexY;
-    private int nOfNeighbors = 0;
+    private int nOfMinedNeighbors = 0;
     private boolean mined, opened, marked;
 
     private static final Color CLOSED_CELL = Color.rgb(128, 128, 128);
     private static final Color OPENED_EMPTY_CELL = Color.rgb(253, 234, 168);
     private static final Color OPENED_MINED_CELL = Color.rgb(220, 20, 60);
     private static final Color MARKED_CELL = Color.rgb(0, 0, 0);
+    private static final Color TRULY = Color.GREEN;
 
     Cell(double coordX, double coordY, double sideLength) {
         this.opened = false;
@@ -33,8 +34,8 @@ class Cell {
         return actionListenerHexagon;
     }
 
-    Label getNOfNeighborsLabel() {
-        return nOfNeighborsLabel;
+    Label getNOfMinedNeighborsLabel() {
+        return nOfMinedNeighborsLabel;
     }
 
     void setIndexX(int indexX) {
@@ -53,15 +54,15 @@ class Cell {
         return indexY;
     }
 
-    void setNOfNeighbors(int nOfNeighbors) {
-        this.nOfNeighbors = nOfNeighbors;
+    void setNOfMinedNeighbors(int nOfMinedNeighbors) {
+        this.nOfMinedNeighbors = nOfMinedNeighbors;
     }
 
-    int getNOfNeighbors() {
-        return nOfNeighbors;
+    int getNOfMinedNeighbors() {
+        return nOfMinedNeighbors;
     }
 
-    void setMined() {
+    void mine() {
         mined = true;
     }
 
@@ -69,21 +70,22 @@ class Cell {
         return mined;
     }
 
-    void setOpened() {
+    void open() {
         opened = true;
         marked = false;
         recolor();
-        rewriteNOfNeighborsLabel();
+        rewriteNOfMinedNeighborsLabel();
     }
 
+    @SuppressWarnings({"inverted", "BooleanMethodIsAlwaysInverted"})
     boolean isOpened() {
         return opened;
     }
 
-    void setMarked(boolean marked) {
+    void mark(boolean marked) {
         this.marked = marked;
         recolor();
-        rewriteNOfNeighborsLabel();
+        rewriteNOfMinedNeighborsLabel();
     }
 
     boolean isMarked() {
@@ -104,17 +106,23 @@ class Cell {
             }
         }
         else {
-            hexagon.setFill(MARKED_CELL);
+            if (mined) {
+                hexagon.setFill(TRULY);
+            }
+            else {
+                hexagon.setFill(MARKED_CELL);
+            }
         }
     }
 
-    private void rewriteNOfNeighborsLabel() {
-        if (opened && !mined && !marked && nOfNeighbors > 0) {
-            nOfNeighborsLabel.setText(String.valueOf(nOfNeighbors));
+    private void rewriteNOfMinedNeighborsLabel() {
+        String text = "";
+        if (opened && !mined && !marked && nOfMinedNeighbors > 0) {
+            text = String.valueOf(nOfMinedNeighbors);
         }
-        else {
-            nOfNeighborsLabel.setText("");
-        }
+
+        text += "\n" + this.toString();
+        nOfMinedNeighborsLabel.setText(text);
     }
 
     private void createCell(double coordX, double coordY, double sideLength) {
@@ -128,13 +136,18 @@ class Cell {
         actionListenerHexagon.setFill(Color.TRANSPARENT);
 
         recolor();
-        rewriteNOfNeighborsLabel();
+        rewriteNOfMinedNeighborsLabel();
 
-        nOfNeighborsLabel.setLayoutX(coordX - sideLength * sqrt(3) / 2);
-        nOfNeighborsLabel.setLayoutY(coordY - sideLength);
-        nOfNeighborsLabel.setMinWidth(sideLength * sqrt(3));
-        nOfNeighborsLabel.setMinHeight(sideLength * 2);
-        nOfNeighborsLabel.setFont(new Font(sideLength));
-        nOfNeighborsLabel.setAlignment(Pos.CENTER);
+        nOfMinedNeighborsLabel.setLayoutX(coordX - sideLength * sqrt(3) / 2);
+        nOfMinedNeighborsLabel.setLayoutY(coordY - sideLength);
+        nOfMinedNeighborsLabel.setMinWidth(sideLength * sqrt(3));
+        nOfMinedNeighborsLabel.setMinHeight(sideLength * 2);
+        nOfMinedNeighborsLabel.setFont(new Font(sideLength / 2));
+        nOfMinedNeighborsLabel.setAlignment(Pos.CENTER);
+    }
+
+    @Override
+    public String toString() {
+        return "[" + indexX + ", " + indexY + "]";
     }
 }
