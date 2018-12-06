@@ -8,7 +8,7 @@ import static java.lang.Math.*;
 class Cell {
     private Polygon hexagon = new Polygon();
     private Polygon actionListenerHexagon = new Polygon();
-    private Label nOfMinedNeighborsLabel = new Label();
+    private Label label = new Label();
     private int indexX, indexY;
     private int nOfMinedNeighbors = 0;
     private boolean mined, opened, marked;
@@ -35,7 +35,7 @@ class Cell {
     }
 
     Label getNOfMinedNeighborsLabel() {
-        return nOfMinedNeighborsLabel;
+        return label;
     }
 
     void setIndexX(int indexX) {
@@ -74,7 +74,7 @@ class Cell {
         opened = true;
         marked = false;
         recolor();
-        rewriteNOfMinedNeighborsLabel();
+        rewriteLabel();
     }
 
     @SuppressWarnings({"inverted", "BooleanMethodIsAlwaysInverted"})
@@ -85,7 +85,7 @@ class Cell {
     void mark(boolean marked) {
         this.marked = marked;
         recolor();
-        rewriteNOfMinedNeighborsLabel();
+        rewriteLabel();
     }
 
     boolean isMarked() {
@@ -115,14 +115,14 @@ class Cell {
         }
     }
 
-    private void rewriteNOfMinedNeighborsLabel() {
+    private void rewriteLabel() {
         String text = "";
         if (opened && !mined && !marked && nOfMinedNeighbors > 0) {
             text = String.valueOf(nOfMinedNeighbors);
         }
 
-        text += "\n" + this.toString();
-        nOfMinedNeighborsLabel.setText(text);
+//        text += "\n" + toString();
+        label.setText(text);
     }
 
     private void createCell(double coordX, double coordY, double sideLength) {
@@ -136,14 +136,14 @@ class Cell {
         actionListenerHexagon.setFill(Color.TRANSPARENT);
 
         recolor();
-        rewriteNOfMinedNeighborsLabel();
+        rewriteLabel();
 
-        nOfMinedNeighborsLabel.setLayoutX(coordX - sideLength * sqrt(3) / 2);
-        nOfMinedNeighborsLabel.setLayoutY(coordY - sideLength);
-        nOfMinedNeighborsLabel.setMinWidth(sideLength * sqrt(3));
-        nOfMinedNeighborsLabel.setMinHeight(sideLength * 2);
-        nOfMinedNeighborsLabel.setFont(new Font(sideLength / 2));
-        nOfMinedNeighborsLabel.setAlignment(Pos.CENTER);
+        label.setLayoutX(coordX - sideLength * sqrt(3) / 2);
+        label.setLayoutY(coordY - sideLength);
+        label.setMinWidth(sideLength * sqrt(3));
+        label.setMinHeight(sideLength * 2);
+        label.setFont(new Font(sideLength));
+        label.setAlignment(Pos.CENTER);
     }
 
     @Override

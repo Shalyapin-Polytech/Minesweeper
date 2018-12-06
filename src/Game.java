@@ -4,8 +4,6 @@ import static java.lang.StrictMath.sqrt;
 
 class Game {
     private List<List<Cell>> field = new ArrayList<>();
-    private List<Cell> borderCells = new ArrayList<>();
-    private List<CellsGroup<Cell>> borderCellGroups = new ArrayList<>();
     private Group group = new Group();
     private double windowWidth, windowHeight;
     private int width, height;
@@ -13,13 +11,13 @@ class Game {
     private int remainingNOfMarks, remainingNOfMines = 0;
     private boolean blocked;
 
-    //
-    private HashMap<String, String> ways = new HashMap<>();
-    //
-
     Game(double windowWidth, double windowHeight) {
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
+    }
+
+    List<List<Cell>> getField() {
+        return field;
     }
 
     Group getGroup() {
@@ -51,72 +49,8 @@ class Game {
         setBlocked(true);
     }
 
-    void subtractionMethod() {
-        for (Cell cell : borderCells) {
-            CellsGroup<Cell> thisGroup = new CellsGroup<>();
-            List<Cell> neighbors = getNeighbors(cell);
-            for (Cell neighbor : neighbors) {
-                if (!neighbor.isOpened() && !neighbor.isMarked()) {
-                    thisGroup.add(neighbor);
-                }
-            }
-            thisGroup.setNOfMines(cell.getNOfMinedNeighbors());
-            ways.put(thisGroup.toString(), "");
-
-            List<CellsGroup<Cell>> intersections = new ArrayList<>();
-            for (CellsGroup<Cell> anotherGroup : borderCellGroups) {
-                String thisGroupOld = thisGroup.toString();
-                String anotherGroupOld = anotherGroup.toString();
-                String anotherGroupOldWay = ways.get(anotherGroup.toString());
-                CellsGroup<Cell> intersection = anotherGroup.intersect(thisGroup);
-                if (thisGroup.includes(anotherGroup)) {
-                    thisGroup.subtract(anotherGroup);
-                    ways.put(thisGroup.toString(), thisGroupOld + " - " + anotherGroupOld + " = " + thisGroup.toString());
-                }
-                else if (anotherGroup.includes(thisGroup)) {
-                    anotherGroup.subtract(thisGroup);
-                    ways.put(anotherGroup.toString(), anotherGroupOldWay + ";;; " + anotherGroupOld + " - " + thisGroupOld + " = " + anotherGroup.toString());
-                }
-                else if (intersection.size() > 0) {
-                    intersections.add(intersection);
-                    anotherGroup.subtract(intersection);
-                    thisGroup.subtract(intersection);
-                    String res = thisGroupOld + " ⋂ " + anotherGroupOld + " = " + anotherGroup.toString() + ", " + thisGroup.toString() + ", " + intersection.toString();
-                    ways.put(anotherGroup.toString(), anotherGroupOldWay + ";;; " + res);
-                    ways.put(thisGroup.toString(), res);
-                    ways.put(intersection.toString(), res);
-                }
-            }
-            borderCellGroups.add(thisGroup);
-            borderCellGroups.addAll(intersections);
-        }
-
-        for (CellsGroup<Cell> borderCellGroup : borderCellGroups) {
-            if (borderCellGroup.getNOfMines() == 0) {
-                borderCellGroup.forEach(cell -> {
-                    openWithNeighbors(cell);
-                    if (cell.isMined()) {
-                        System.out.println(ways.get(borderCellGroup.toString()));
-                    }
-                });
-            }
-            else if (borderCellGroup.getNOfMines() == borderCellGroup.size()) {
-                borderCellGroup.forEach(cell -> {
-                    cell.mark(true);
-//                    borderCells.add(cell);
-//                    for (Cell neighbor : getNeighbors(cell)) {
-//                        neighbor.setNOfMinedNeighbors(cell.getNOfMinedNeighbors() - 1);
-//                    }
-                    if (!cell.isMined()) {
-                        System.out.println(ways.get(borderCellGroup.toString()));
-                    }
-                });
-            }
-        }
-    }
-
-    private List<Cell> getNeighbors(Cell cell) {
-        List<Cell> neighbors = new ArrayList<>();
+    Set<Cell> getNeighbors(Cell cell) {
+        Set<Cell> neighbors = new HashSet<>();
         int indexX = cell.getIndexX();
         int indexY = cell.getIndexY();
         int[] listX;
@@ -146,9 +80,9 @@ class Game {
         return neighbors;
     }
 
-    private void openWithNeighbors(Cell cell) {
+    void openWithNeighbors(Cell cell) {
         cell.open();
-        List<Cell> neighbors = getNeighbors(cell);
+        Set<Cell> neighbors = getNeighbors(cell);
         if (!cell.isMined()) {
             if (cell.getNOfMinedNeighbors() == 0) {
                 for (Cell neighbor : neighbors) {
@@ -157,11 +91,7 @@ class Game {
                     }
                 }
             }
-            else {
-                borderCells.add(cell);
-            }
         }
-//        borderCells.forEach(borderCell -> borderCell.mark(true));
     }
 
     private void addMouseListener(Cell cell) {
@@ -206,7 +136,7 @@ class Game {
 
     private void findMinedNeighbors() {
         field.forEach(cells -> cells.forEach(cell -> {
-            List<Cell> neighbors = getNeighbors(cell);
+            Set<Cell> neighbors = getNeighbors(cell);
             for (Cell neighbor : neighbors) {
                 if (neighbor.isMined()) {
                     cell.setNOfMinedNeighbors(cell.getNOfMinedNeighbors() + 1);
@@ -266,9 +196,6 @@ class Game {
 
     private void clearField() {
         field.clear();
-        borderCells.clear();
-        borderCellGroups.clear();
-        ways.clear();
         group.getChildren().clear();
     }
 }

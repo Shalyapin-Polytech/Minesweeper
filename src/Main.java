@@ -74,7 +74,7 @@ public class Main extends Application {
         gameMenuPane.getChildren().add(openAllButton);
 
         Button botActivationButton = new Button("Выпустить кракена");
-        botActivationButton.setOnAction(event -> game.subtractionMethod());
+        botActivationButton.setOnAction(event -> new Solver(game).subtractionMethod());
         gameMenuPane.getChildren().add(botActivationButton);
 
         Button exitToMenuButton = new Button("Выход в меню");
