@@ -131,7 +131,9 @@ class Solver {
                 borderCellGroup.forEach(cell -> game.openWithNeighbors(cell));
             }
             else if (borderCellGroup.getNOfMines() == borderCellGroup.size()) {
-                borderCellGroup.forEach(cell -> cell.mark(true));
+                borderCellGroup.removeIf(Cell::isMarked);
+                borderCellGroup.forEach(cell -> game.mark(cell, true));
+                Main.setRemainingNOfMarksLabel(game.getRemainingNOfMarks());
             }
         }
     }

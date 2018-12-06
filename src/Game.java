@@ -32,6 +32,10 @@ class Game {
         this.gameMode = gameMode;
     }
 
+    int getRemainingNOfMarks() {
+        return remainingNOfMarks;
+    }
+
     private void setBlocked(boolean blocked) {
         this.blocked = blocked;
     }
@@ -94,13 +98,28 @@ class Game {
         }
     }
 
+    void mark(Cell cell, boolean marked) {
+        cell.mark(marked);
+        if (marked) {
+            remainingNOfMarks--;
+            if (cell.isMined()) {
+                remainingNOfMines--;
+            }
+        }
+        else {
+            remainingNOfMarks++;
+            if (cell.isMined()) {
+                remainingNOfMines++;
+            }
+        }
+    }
+
     private void addMouseListener(Cell cell) {
         cell.getActionListenerHexagon().setOnMousePressed(t -> {
             if (!blocked) {
                 if (t.isPrimaryButtonDown()) {
                     if (cell.isMarked()) {
-                        cell.mark(false);
-                        remainingNOfMarks++;
+                        mark(cell, false);
                     }
                     if (cell.isMined()) {
                         openAll();
@@ -111,21 +130,13 @@ class Game {
                 }
                 if (t.isSecondaryButtonDown()) {
                     if (cell.isMarked()) {
-                        cell.mark(false);
-                        remainingNOfMarks++;
-                        if (cell.isMined()) {
-                            remainingNOfMines++;
-                        }
+                        mark(cell, false);
                     }
                     else if (remainingNOfMarks > 0) {
-                        cell.mark(true);
-                        remainingNOfMarks--;
-                        if (cell.isMined()) {
-                            remainingNOfMines--;
-                            if (remainingNOfMines == 0) {
-                                setBlocked(true);
-                                Main.createGameResultStage(true);
-                            }
+                        mark(cell, true);
+                        if (remainingNOfMines == 0) {
+                            setBlocked(true);
+                            Main.createGameResultStage(true);
                         }
                     }
                 }
