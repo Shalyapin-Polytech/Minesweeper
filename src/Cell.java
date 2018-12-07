@@ -17,7 +17,6 @@ class Cell {
     private static final Color OPENED_EMPTY_CELL = Color.rgb(253, 234, 168);
     private static final Color OPENED_MINED_CELL = Color.rgb(220, 20, 60);
     private static final Color MARKED_CELL = Color.rgb(0, 0, 0);
-    private static final Color TRULY = Color.GREEN;
 
     Cell(double coordX, double coordY, double sideLength) {
         this.opened = false;
@@ -106,12 +105,7 @@ class Cell {
             }
         }
         else {
-            if (mined) {
-                hexagon.setFill(TRULY);
-            }
-            else {
-                hexagon.setFill(MARKED_CELL);
-            }
+            hexagon.setFill(MARKED_CELL);
         }
     }
 

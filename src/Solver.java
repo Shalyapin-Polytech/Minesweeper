@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.stream.Collectors;
 
 class Solver {
     private Game game;
@@ -8,7 +9,12 @@ class Solver {
     }
 
     private class CellsGroup<E> extends HashSet<E> {
-        private int nOfMines = 0;
+        private int nOfMines;
+
+        CellsGroup(Set<E> cells, int nOfMines) {
+            addAll(cells);
+            this.nOfMines = nOfMines;
+        }
 
         void setNOfMines(int nOfMines) {
             this.nOfMines = nOfMines;
@@ -16,11 +22,6 @@ class Solver {
 
         int getNOfMines() {
             return nOfMines;
-        }
-
-        @Override
-        public boolean add(E e) {
-            return !this.contains(e) && super.add(e);
         }
 
         boolean includes(CellsGroup<E> another) {
@@ -61,78 +62,55 @@ class Solver {
         }
     }
 
-    private Set<Cell> getBorderCells() {
-        Set<Cell> borderCells = new HashSet<>();
-        game.getField().forEach(row -> row.forEach(cell -> {
-            if (cell.isOpened() || cell.isMarked()) {
-                for (Cell neighbor : game.getNeighbors(cell)) {
-                    if (!neighbor.isOpened() && !neighbor.isMarked()) {
-                        borderCells.add(cell);
-                        break;
-                    }
-                }
+    private CellsGroup<Cell> createCellsGroup(Cell cell) {
+        if (cell.isOpened()) {
+            Set<Cell> neighbors = game.getNeighbors(cell);
+            Set<Cell> closedNeighbors = new HashSet<>(neighbors).stream()
+                    .filter(n -> !n.isOpened() && !n.isMarked()).collect(Collectors.toSet());
+            Set<Cell> markedNeighbors = new HashSet<>(neighbors).stream()
+                    .filter(Cell::isMarked).collect(Collectors.toSet());
+            if (closedNeighbors.size() != 0) {
+                return new CellsGroup<>(closedNeighbors, cell.getNOfMinedNeighbors() - markedNeighbors.size());
             }
-        }));
-        return borderCells;
+        }
+        return null;
     }
 
     void subtractionMethod() {
-        Set<CellsGroup<Cell>> borderCellGroups = new HashSet<>();
-//        HashMap<String, String> ways = new HashMap<>();
-
-        for (Cell cell : getBorderCells()) {
-            CellsGroup<Cell> thisGroup = new CellsGroup<>();
-            int nOfMarkedNeighbors = 0;
-            Set<Cell> neighbors = game.getNeighbors(cell);
-            for (Cell neighbor : neighbors) {
-                if (!neighbor.isOpened() && !neighbor.isMarked()) {
-                    thisGroup.add(neighbor);
-                }
-                else if (neighbor.isMarked()) {
-                    nOfMarkedNeighbors++;
-                }
-            }
-            thisGroup.setNOfMines(cell.getNOfMinedNeighbors() - nOfMarkedNeighbors);
-//            ways.put(thisGroup.toString(), "");
-
-//            Set<CellsGroup<Cell>> intersections = new HashSet<>();
-            for (CellsGroup<Cell> anotherGroup : borderCellGroups) {
-                if (anotherGroup.size() != 0) {
-//                    String thisGroupOld = thisGroup.toString();
-//                    String anotherGroupOld = anotherGroup.toString();
-//                    String anotherGroupOldWay = ways.get(anotherGroup.toString());
+        Set<CellsGroup<Cell>> borderCellsGroups = new HashSet<>();
+        game.getField().forEach(row -> row.forEach(cell -> {
+            CellsGroup<Cell> thisGroup = createCellsGroup(cell);
+            if (thisGroup != null) {
+//                Set<CellsGroup<Cell>> intersections = new HashSet<>();
+                for (CellsGroup<Cell> anotherGroup : borderCellsGroups) {
 //                    CellsGroup<Cell> intersection = anotherGroup.intersect(thisGroup);
-
+                    if (thisGroup.equals(anotherGroup)) {
+                        continue;
+                    }
                     if (thisGroup.includes(anotherGroup)) {
                         thisGroup.subtract(anotherGroup);
-//                        ways.put(thisGroup.toString(), thisGroupOld + " - " + anotherGroupOld + " = " + thisGroup.toString());
                     }
                     else if (anotherGroup.includes(thisGroup)) {
                         anotherGroup.subtract(thisGroup);
-//                        ways.put(anotherGroup.toString(), anotherGroupOldWay + ";;;\n" + anotherGroupOld + " - " + thisGroupOld + " = " + anotherGroup.toString());
                     }
 //                    else if (intersection.size() > 0) {
 //                        intersections.add(intersection);
 //                        anotherGroup.subtract(intersection);
 //                        thisGroup.subtract(intersection);
-//                        String res = thisGroupOld + " ⋂ " + anotherGroupOld + " = " + anotherGroup.toString() + ", " + thisGroup.toString() + ", " + intersection.toString();
-//                        ways.put(anotherGroup.toString(), anotherGroupOldWay + ";;;\n" + res);
-//                        ways.put(thisGroup.toString(), res);
-//                        ways.put(intersection.toString(), res);
 //                    }
                 }
+                borderCellsGroups.add(thisGroup);
+//                borderCellGroups.addAll(intersections);
             }
-            borderCellGroups.add(thisGroup);
-//            borderCellGroups.addAll(intersections);
-        }
+        }));
 
-        for (CellsGroup<Cell> borderCellGroup : borderCellGroups) {
-            if (borderCellGroup.getNOfMines() == 0) {
-                borderCellGroup.forEach(cell -> game.openWithNeighbors(cell));
+        for (CellsGroup<Cell> borderCellsGroup : borderCellsGroups) {
+            if (borderCellsGroup.getNOfMines() == 0) {
+                borderCellsGroup.forEach(cell -> game.openWithNeighbors(cell));
             }
-            else if (borderCellGroup.getNOfMines() == borderCellGroup.size()) {
-                borderCellGroup.removeIf(Cell::isMarked);
-                borderCellGroup.forEach(cell -> game.mark(cell, true));
+            else if (borderCellsGroup.getNOfMines() == borderCellsGroup.size()) {
+                borderCellsGroup.removeIf(Cell::isMarked);
+                borderCellsGroup.forEach(cell -> game.mark(cell, true));
                 Main.setRemainingNOfMarksLabel(game.getRemainingNOfMarks());
             }
         }
