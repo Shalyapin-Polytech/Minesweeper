@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.function.Consumer;
 import javafx.scene.*;
 import static java.lang.StrictMath.sqrt;
 
@@ -14,10 +15,6 @@ class Game {
     Game(double windowWidth, double windowHeight) {
         this.windowWidth = windowWidth;
         this.windowHeight = windowHeight;
-    }
-
-    List<List<Cell>> getField() {
-        return field;
     }
 
     Group getGroup() {
@@ -40,6 +37,10 @@ class Game {
         this.blocked = blocked;
     }
 
+    void forEachCell(Consumer<Cell> action) {
+        field.forEach(row -> row.forEach(action));
+    }
+
     void restart() {
         clearField();
         createField();
@@ -49,7 +50,7 @@ class Game {
     }
 
     void openAll() {
-        field.forEach(cells -> cells.forEach(Cell::open));
+        forEachCell(Cell::open);
         setBlocked(true);
     }
 
@@ -146,14 +147,14 @@ class Game {
     }
 
     private void findMinedNeighbors() {
-        field.forEach(cells -> cells.forEach(cell -> {
+        forEachCell(cell -> {
             Set<Cell> neighbors = getNeighbors(cell);
             for (Cell neighbor : neighbors) {
                 if (neighbor.isMined()) {
                     cell.setNOfMinedNeighbors(cell.getNOfMinedNeighbors() + 1);
                 }
             }
-        }));
+        });
     }
 
     private void setMines() {

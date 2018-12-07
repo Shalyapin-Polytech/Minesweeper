@@ -78,7 +78,7 @@ class Solver {
 
     void subtractionMethod() {
         Set<CellsGroup<Cell>> borderCellsGroups = new HashSet<>();
-        game.getField().forEach(row -> row.forEach(cell -> {
+        game.forEachCell(cell -> {
             CellsGroup<Cell> thisGroup = createCellsGroup(cell);
             if (thisGroup != null) {
 //                Set<CellsGroup<Cell>> intersections = new HashSet<>();
@@ -102,7 +102,7 @@ class Solver {
                 borderCellsGroups.add(thisGroup);
 //                borderCellGroups.addAll(intersections);
             }
-        }));
+        });
 
         for (CellsGroup<Cell> borderCellsGroup : borderCellsGroups) {
             if (borderCellsGroup.getNOfMines() == 0) {
