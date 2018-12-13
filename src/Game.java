@@ -33,8 +33,18 @@ class Game {
         return remainingNOfMarks;
     }
 
+    boolean isFirstMove() {
+        return firstMove;
+    }
+
     void forEachCell(Consumer<Cell> action) {
         field.forEach(row -> row.forEach(action));
+    }
+
+    Cell getRandCell() {
+        int randWidth = new Random().nextInt(width);
+        int randHeight = new Random().nextInt(height);
+        return field.get(randWidth).get(randHeight);
     }
 
     void restart() {
@@ -79,7 +89,7 @@ class Game {
         return neighbors;
     }
 
-    void openWithNeighbors(Cell cell) {
+    private void openWithNeighbors(Cell cell) {
         cell.open();
         Set<Cell> neighbors = getNeighbors(cell);
         if (!cell.isMined()) {
@@ -93,7 +103,7 @@ class Game {
         }
     }
 
-    void mark(Cell cell, boolean marked) {
+    private void mark(Cell cell, boolean marked) {
         cell.mark(marked);
         if (marked) {
             remainingNOfMarks--;
@@ -109,46 +119,65 @@ class Game {
         }
     }
 
+    private enum Action {
+        OPEN, MARK
+    }
+
+    private void action(Cell cell, Action action) {
+        if (!blocked) {
+            if (firstMove) {
+                setMines(cell);
+                firstMove = false;
+            }
+            if (action == Action.OPEN) {
+                if (cell.isMarked()) {
+                    mark(cell, false);
+                }
+                if (cell.isMined()) {
+                    openAll();
+                    blocked = true;
+                    Main.createGameResultStage(false);
+                }
+                openWithNeighbors(cell);
+            }
+            if (action == Action.MARK) {
+                if (cell.isMarked()) {
+                    mark(cell, false);
+                }
+                else if (remainingNOfMarks > 0) {
+                    mark(cell, true);
+                    if (remainingNOfMines == 0) {
+                        blocked = true;
+                        Main.createGameResultStage(true);
+                    }
+                }
+            }
+            Main.setRemainingNOfMarksLabel(remainingNOfMarks);
+        }
+    }
+
+    void mark(Cell cell) {
+        action(cell, Action.MARK);
+    }
+
+    void open(Cell cell) {
+        action(cell, Action.OPEN);
+    }
+
     private void addMouseListener(Cell cell) {
         cell.getActionListenerHexagon().setOnMousePressed(t -> {
-            if (!blocked) {
-                if (firstMove) {
-                    setMines(cell);
-                    firstMove = false;
-                }
-                if (t.isPrimaryButtonDown()) {
-                    if (cell.isMarked()) {
-                        mark(cell, false);
-                    }
-                    if (cell.isMined()) {
-                        openAll();
-                        blocked = true;
-                        Main.createGameResultStage(false);
-                    }
-                    openWithNeighbors(cell);
-                }
-                if (t.isSecondaryButtonDown()) {
-                    if (cell.isMarked()) {
-                        mark(cell, false);
-                    }
-                    else if (remainingNOfMarks > 0) {
-                        mark(cell, true);
-                        if (remainingNOfMines == 0) {
-                            blocked = true;
-                            Main.createGameResultStage(true);
-                        }
-                    }
-                }
-                Main.setRemainingNOfMarksLabel(remainingNOfMarks);
+            if (t.isPrimaryButtonDown()) {
+                open(cell);
+            }
+            if (t.isSecondaryButtonDown()) {
+                mark(cell);
             }
         });
     }
 
     private void setMines(Cell forbiddenCell) {
         for (int i = remainingNOfMines; i > 0;) {
-            int randWidth = new Random().nextInt(width);
-            int randHeight = new Random().nextInt(height);
-            Cell randCell = field.get(randWidth).get(randHeight);
+            Cell randCell = getRandCell();
             if (!randCell.equals(forbiddenCell) && !randCell.isMined()) {
                 randCell.mine();
                 i--;
