@@ -10,7 +10,7 @@ class Game {
     private int width, height;
     private GameMode gameMode;
     private int remainingNOfMarks, remainingNOfMines = 0;
-    private boolean blocked;
+    private boolean blocked, firstMove;
 
     Game(double windowWidth, double windowHeight) {
         this.windowWidth = windowWidth;
@@ -33,10 +33,6 @@ class Game {
         return remainingNOfMarks;
     }
 
-    private void setBlocked(boolean blocked) {
-        this.blocked = blocked;
-    }
-
     void forEachCell(Consumer<Cell> action) {
         field.forEach(row -> row.forEach(action));
     }
@@ -44,14 +40,12 @@ class Game {
     void restart() {
         clearField();
         createField();
-        setMines();
-        findMinedNeighbors();
-        setBlocked(false);
+        blocked = false;
     }
 
     void openAll() {
         forEachCell(Cell::open);
-        setBlocked(true);
+        blocked = true;
     }
 
     Set<Cell> getNeighbors(Cell cell) {
@@ -118,13 +112,17 @@ class Game {
     private void addMouseListener(Cell cell) {
         cell.getActionListenerHexagon().setOnMousePressed(t -> {
             if (!blocked) {
+                if (firstMove) {
+                    setMines(cell);
+                    firstMove = false;
+                }
                 if (t.isPrimaryButtonDown()) {
                     if (cell.isMarked()) {
                         mark(cell, false);
                     }
                     if (cell.isMined()) {
                         openAll();
-                        setBlocked(true);
+                        blocked = true;
                         Main.createGameResultStage(false);
                     }
                     openWithNeighbors(cell);
@@ -136,7 +134,7 @@ class Game {
                     else if (remainingNOfMarks > 0) {
                         mark(cell, true);
                         if (remainingNOfMines == 0) {
-                            setBlocked(true);
+                            blocked = true;
                             Main.createGameResultStage(true);
                         }
                     }
@@ -146,34 +144,18 @@ class Game {
         });
     }
 
-    private void findMinedNeighbors() {
-        forEachCell(cell -> {
-            Set<Cell> neighbors = getNeighbors(cell);
-            for (Cell neighbor : neighbors) {
-                if (neighbor.isMined()) {
-                    cell.setNOfMinedNeighbors(cell.getNOfMinedNeighbors() + 1);
-                }
-            }
-        });
-    }
-
-    private void setMines() {
-        int nOfCells = width * height;
-        if (gameMode == null) {
-            gameMode = GameMode.MEDIUM;
-        }
-        int nOfMines = (int) (nOfCells * gameMode.getProportionOfMines());
-        remainingNOfMarks = nOfMines;
-        remainingNOfMines = nOfMines;
-        Main.setRemainingNOfMarksLabel(remainingNOfMarks);
-
-        for (int i = nOfMines; i > 0;) {
+    private void setMines(Cell forbiddenCell) {
+        for (int i = remainingNOfMines; i > 0;) {
             int randWidth = new Random().nextInt(width);
             int randHeight = new Random().nextInt(height);
             Cell randCell = field.get(randWidth).get(randHeight);
-            if (!randCell.isMined()) {
+            if (!randCell.equals(forbiddenCell) && !randCell.isMined()) {
                 randCell.mine();
                 i--;
+
+                for (Cell neighbor : getNeighbors(randCell)) {
+                    neighbor.setNOfMinedNeighbors(neighbor.getNOfMinedNeighbors() + 1);
+                }
             }
         }
     }
@@ -204,9 +186,19 @@ class Game {
             }
             field.add(row);
         }
+
+        int nOfCells = width * height;
+        if (gameMode == null) {
+            gameMode = GameMode.MEDIUM;
+        }
+        int nOfMines = (int) (nOfCells * gameMode.getProportionOfMines());
+        remainingNOfMarks = nOfMines;
+        remainingNOfMines = nOfMines;
+        Main.setRemainingNOfMarksLabel(remainingNOfMarks);
     }
 
     private void clearField() {
+        firstMove = true;
         field.clear();
         group.getChildren().clear();
     }

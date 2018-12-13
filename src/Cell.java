@@ -55,6 +55,7 @@ class Cell {
 
     void setNOfMinedNeighbors(int nOfMinedNeighbors) {
         this.nOfMinedNeighbors = nOfMinedNeighbors;
+        rewriteLabel();
     }
 
     int getNOfMinedNeighbors() {
@@ -114,8 +115,6 @@ class Cell {
         if (opened && !mined && !marked && nOfMinedNeighbors > 0) {
             text = String.valueOf(nOfMinedNeighbors);
         }
-
-//        text += "\n" + toString();
         label.setText(text);
     }
 
