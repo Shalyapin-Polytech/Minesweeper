@@ -16,45 +16,19 @@ class Solver {
             this.nOfMines = nOfMines;
         }
 
-        void setNOfMines(int nOfMines) {
-            this.nOfMines = nOfMines;
-        }
-
-        int getNOfMines() {
-            return nOfMines;
-        }
-
         boolean includes(CellsGroup<E> another) {
             return containsAll(another) && nOfMines >= another.nOfMines;
+        }
+
+        boolean intersects(CellsGroup<E> another) {
+            return new HashSet<>(another).stream()
+                    .filter(this::contains).collect(Collectors.toSet()).size() > 0;
         }
 
         void subtract(CellsGroup<E> another) {
             removeAll(another);
             nOfMines -= another.nOfMines;
         }
-
-//        CellsGroup<E> intersect(CellsGroup<E> another) {
-//            CellsGroup<E> larger, smaller;
-//            if (nOfMines > another.nOfMines || nOfMines == another.nOfMines && size() > another.size()) {
-//                larger = this;
-//                smaller = another;
-//            }
-//            else {
-//                larger = another;
-//                smaller = this;
-//            }
-//            CellsGroup<E> result = new CellsGroup<>();
-//            result.addAll(larger);
-//            result.retainAll(smaller);
-//
-//            int resultNOfMines = larger.nOfMines - ( smaller.size() - result.size() );
-//            result.setNOfMines(resultNOfMines);
-//
-//            if (resultNOfMines != smaller.nOfMines) {
-//                return new CellsGroup<>();
-//            }
-//            return result;
-//        }
 
         @Override
         public String toString() {
@@ -77,13 +51,17 @@ class Solver {
     }
 
     void subtractionMethod() {
+        if (game.isFirstMove()) {
+            game.open(game.getRandCell());
+        }
+
         Set<CellsGroup<Cell>> borderCellsGroups = new HashSet<>();
         game.forEachCell(cell -> {
             CellsGroup<Cell> thisGroup = createCellsGroup(cell);
             if (thisGroup != null) {
 //                Set<CellsGroup<Cell>> intersections = new HashSet<>();
                 for (CellsGroup<Cell> anotherGroup : borderCellsGroups) {
-//                    CellsGroup<Cell> intersection = anotherGroup.intersect(thisGroup);
+//                    CellsGroup<Cell> intersection = anotherGroup.intersects(thisGroup);
                     if (thisGroup.equals(anotherGroup)) {
                         continue;
                     }
@@ -105,12 +83,12 @@ class Solver {
         });
 
         for (CellsGroup<Cell> borderCellsGroup : borderCellsGroups) {
-            if (borderCellsGroup.getNOfMines() == 0) {
-                borderCellsGroup.forEach(cell -> game.openWithNeighbors(cell));
+            if (borderCellsGroup.nOfMines == 0) {
+                borderCellsGroup.forEach(cell -> game.open(cell));
             }
-            else if (borderCellsGroup.getNOfMines() == borderCellsGroup.size()) {
+            else if (borderCellsGroup.nOfMines == borderCellsGroup.size()) {
                 borderCellsGroup.removeIf(Cell::isMarked);
-                borderCellsGroup.forEach(cell -> game.mark(cell, true));
+                borderCellsGroup.forEach(cell -> game.mark(cell));
                 Main.setRemainingNOfMarksLabel(game.getRemainingNOfMarks());
             }
         }
