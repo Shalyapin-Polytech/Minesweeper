@@ -134,7 +134,7 @@ class Game {
                     mark(cell, false);
                 }
                 if (cell.isMined()) {
-                    openAll();
+//                    openAll();
                     blocked = true;
                     Main.createGameResultStage(false);
                 }

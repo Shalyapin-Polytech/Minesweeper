@@ -74,7 +74,7 @@ public class Main extends Application {
         gameMenuPane.getChildren().add(openAllButton);
 
         Button botActivationButton = new Button("Решить");
-        botActivationButton.setOnAction(event -> new Solver(game).subtractionMethod());
+        botActivationButton.setOnAction(event -> new Solver(game).solve());
         gameMenuPane.getChildren().add(botActivationButton);
 
         Button exitToMenuButton = new Button("Выход в меню");
@@ -145,6 +145,7 @@ public class Main extends Application {
         ToggleButton easyModeItem = new ToggleButton("Простой");
         ToggleButton mediumModeItem = new ToggleButton("Средний");
         ToggleButton hardModeItem = new ToggleButton("Сложный");
+        ToggleButton impossibleModeItem = new ToggleButton("Очень сложный");
 
         easyModeItem.setOnAction(event -> {
             continueButton.setDisable(true);
@@ -176,6 +177,16 @@ public class Main extends Application {
         hardModeItem.setToggleGroup(choiceMode);
         choosePane.add(hardModeItem, 3, 0);
 
+        impossibleModeItem.setOnAction(event -> {
+            continueButton.setDisable(true);
+            game.setGameMode(GameMode.IMPOSSIBLE);
+            if (!impossibleModeItem.isSelected()) {
+                game.setGameMode(null);
+            }
+        });
+        impossibleModeItem.setToggleGroup(choiceMode);
+        choosePane.add(impossibleModeItem, 4, 0);
+
         Label choiceWidthAnnotation = new Label("Ширина поля:");
 
         Label sliderValueLabel = new Label();
@@ -185,7 +196,7 @@ public class Main extends Application {
         widthSlider.setMax(MAX_WIDTH);
         widthSlider.setValue(DEFAULT_WIDTH);
         widthSlider.setShowTickLabels(true);
-        widthSlider.setMinWidth(350);
+        widthSlider.setMinWidth(450);
 
         game.setWidth(DEFAULT_WIDTH);
         sliderValueLabel.setText(String.valueOf(DEFAULT_WIDTH));
@@ -202,7 +213,7 @@ public class Main extends Application {
         sliderPane.add(sliderValueLabel, 1, 0);
 
         choosePane.add(choiceWidthAnnotation, 0, 1);
-        choosePane.add(sliderPane, 1, 1, 3, 1);
+        choosePane.add(sliderPane, 1, 1, 4, 1);
 
         mainMenuPane.add(mainButtonsPane, 0, 0);
         mainMenuPane.add(choosePane, 0, 1);

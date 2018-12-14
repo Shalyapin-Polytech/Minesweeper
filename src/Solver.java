@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 class Solver {
@@ -18,11 +19,6 @@ class Solver {
 
         boolean includes(CellsGroup<E> another) {
             return containsAll(another) && nOfMines >= another.nOfMines;
-        }
-
-        boolean intersects(CellsGroup<E> another) {
-            return new HashSet<>(another).stream()
-                    .filter(this::contains).collect(Collectors.toSet()).size() > 0;
         }
 
         void subtract(CellsGroup<E> another) {
@@ -50,7 +46,8 @@ class Solver {
         return null;
     }
 
-    void subtractionMethod() {
+    void solve() {
+        boolean changed = false;
         if (game.isFirstMove()) {
             game.open(game.getRandCell());
         }
@@ -59,9 +56,7 @@ class Solver {
         game.forEachCell(cell -> {
             CellsGroup<Cell> thisGroup = createCellsGroup(cell);
             if (thisGroup != null) {
-//                Set<CellsGroup<Cell>> intersections = new HashSet<>();
                 for (CellsGroup<Cell> anotherGroup : borderCellsGroups) {
-//                    CellsGroup<Cell> intersection = anotherGroup.intersects(thisGroup);
                     if (thisGroup.equals(anotherGroup)) {
                         continue;
                     }
@@ -71,25 +66,51 @@ class Solver {
                     else if (anotherGroup.includes(thisGroup)) {
                         anotherGroup.subtract(thisGroup);
                     }
-//                    else if (intersection.size() > 0) {
-//                        intersections.add(intersection);
-//                        anotherGroup.subtract(intersection);
-//                        thisGroup.subtract(intersection);
-//                    }
                 }
                 borderCellsGroups.add(thisGroup);
-//                borderCellGroups.addAll(intersections);
             }
         });
 
         for (CellsGroup<Cell> borderCellsGroup : borderCellsGroups) {
             if (borderCellsGroup.nOfMines == 0) {
                 borderCellsGroup.forEach(cell -> game.open(cell));
+                changed = true;
             }
             else if (borderCellsGroup.nOfMines == borderCellsGroup.size()) {
                 borderCellsGroup.removeIf(Cell::isMarked);
                 borderCellsGroup.forEach(cell -> game.mark(cell));
                 Main.setRemainingNOfMarksLabel(game.getRemainingNOfMarks());
+                changed = true;
+            }
+        }
+
+        if (!changed) {
+            Map<Cell, Double> probabilities = new HashMap<>();
+            for (CellsGroup<Cell> borderCellsGroup : borderCellsGroups) {
+                if (borderCellsGroup.size() > 0) {
+                    borderCellsGroup.forEach(cell -> {
+                        double indieProbability = borderCellsGroup.nOfMines / (double) borderCellsGroup.size();
+                        double oldProbability = probabilities.get(cell) != null ? probabilities.get(cell) : 0;
+                        double newProbability = 1 - (1 - indieProbability) * (1 - oldProbability);
+                        probabilities.put(cell, newProbability);
+                    });
+                }
+            }
+
+            Cell maxProbabilityCell = Collections.max(
+                    probabilities.entrySet(),
+                    Comparator.comparingDouble(Map.Entry::getValue)
+            ).getKey();
+            Cell minProbabilityCell = Collections.min(
+                    probabilities.entrySet(),
+                    Comparator.comparingDouble(Map.Entry::getValue)
+            ).getKey();
+
+            if (probabilities.get(minProbabilityCell)  < 1 - probabilities.get(maxProbabilityCell)) {
+                game.open(minProbabilityCell);
+            }
+            else {
+                game.mark(maxProbabilityCell);
             }
         }
     }
