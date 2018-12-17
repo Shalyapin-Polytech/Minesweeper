@@ -70,7 +70,7 @@ public class Main extends Application {
         gameMenuPane.getChildren().add(restartButton);
 
         Button openAllButton = new Button("Открыть все");
-        openAllButton.setOnAction(event -> game.openAll());
+        openAllButton.setOnAction(event -> game.demonstrateMines());
         gameMenuPane.getChildren().add(openAllButton);
 
         Button botActivationButton = new Button("Решить");

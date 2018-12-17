@@ -1,5 +1,4 @@
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 class Solver {
@@ -50,6 +49,7 @@ class Solver {
         boolean changed = false;
         if (game.isFirstMove()) {
             game.open(game.getRandCell());
+            changed = true;
         }
 
         Set<CellsGroup<Cell>> borderCellsGroups = new HashSet<>();
@@ -77,14 +77,14 @@ class Solver {
                 changed = true;
             }
             else if (borderCellsGroup.nOfMines == borderCellsGroup.size()) {
+                ///
                 borderCellsGroup.removeIf(Cell::isMarked);
                 borderCellsGroup.forEach(cell -> game.mark(cell));
-                Main.setRemainingNOfMarksLabel(game.getRemainingNOfMarks());
                 changed = true;
             }
         }
 
-        if (!changed) {
+        if (!changed && borderCellsGroups.size() > 0 && !game.isBlocked()) {
             Map<Cell, Double> probabilities = new HashMap<>();
             for (CellsGroup<Cell> borderCellsGroup : borderCellsGroups) {
                 if (borderCellsGroup.size() > 0) {
@@ -108,10 +108,26 @@ class Solver {
 
             if (probabilities.get(minProbabilityCell)  < 1 - probabilities.get(maxProbabilityCell)) {
                 game.open(minProbabilityCell);
+                changed = true;
             }
             else {
                 game.mark(maxProbabilityCell);
+                changed = true;
             }
         }
+
+        if (!changed && borderCellsGroups.size() == 0 && !game.isBlocked()) {
+            List<Cell> closedCells = new ArrayList<>();
+            game.forEachCell(cell -> {
+                if (!cell.isOpened() && !cell.isMarked()) {
+                    closedCells.add(cell);
+                }
+            });
+            game.open(closedCells.get(new Random().nextInt(closedCells.size())));
+        }
+
+//        if (changed && !game.isBlocked()) {
+//            solve();
+//        }
     }
 }

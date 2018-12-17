@@ -29,8 +29,8 @@ class Game {
         this.gameMode = gameMode;
     }
 
-    int getRemainingNOfMarks() {
-        return remainingNOfMarks;
+    boolean isBlocked() {
+        return blocked;
     }
 
     boolean isFirstMove() {
@@ -53,8 +53,12 @@ class Game {
         blocked = false;
     }
 
-    void openAll() {
-        forEachCell(Cell::open);
+    void demonstrateMines() {
+        forEachCell(cell -> {
+            if (cell.isMined() && !cell.isOpened()) {
+                cell.demonstrate();
+            }
+        });
         blocked = true;
     }
 
@@ -130,15 +134,15 @@ class Game {
                 firstMove = false;
             }
             if (action == Action.OPEN) {
+                openWithNeighbors(cell);
                 if (cell.isMarked()) {
                     mark(cell, false);
                 }
                 if (cell.isMined()) {
-//                    openAll();
+                    demonstrateMines();
                     blocked = true;
                     Main.createGameResultStage(false);
                 }
-                openWithNeighbors(cell);
             }
             if (action == Action.MARK) {
                 if (cell.isMarked()) {

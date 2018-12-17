@@ -11,12 +11,14 @@ class Cell {
     private Label label = new Label();
     private int indexX, indexY;
     private int nOfMinedNeighbors = 0;
-    private boolean mined, opened, marked;
+    private boolean mined, opened, marked, demonstrated;
 
     private static final Color CLOSED_CELL = Color.rgb(128, 128, 128);
     private static final Color OPENED_EMPTY_CELL = Color.rgb(253, 234, 168);
     private static final Color OPENED_MINED_CELL = Color.rgb(220, 20, 60);
     private static final Color MARKED_CELL = Color.rgb(0, 0, 0);
+    private static final Color DEMONSTRATED_NOT_MARKED_CELL = Color.rgb(128, 0, 0);
+    private static final Color DEMONSTRATED_MARKED_CELL = Color.GREEN;
 
     Cell(double coordX, double coordY, double sideLength) {
         this.opened = false;
@@ -92,21 +94,34 @@ class Cell {
         return marked;
     }
 
+    void demonstrate() {
+        demonstrated = true;
+        recolor();
+        rewriteLabel();
+    }
+
     private void recolor() {
-        if (!marked) {
-            if (opened) {
-                if (mined) {
-                    hexagon.setFill(OPENED_MINED_CELL);
-                } else {
-                    hexagon.setFill(OPENED_EMPTY_CELL);
-                }
+        if (demonstrated && mined) {
+            if (marked) {
+                hexagon.setFill(DEMONSTRATED_MARKED_CELL);
             }
             else {
-                hexagon.setFill(CLOSED_CELL);
+                hexagon.setFill(DEMONSTRATED_NOT_MARKED_CELL);
+            }
+        }
+        else if (marked) {
+            hexagon.setFill(MARKED_CELL);
+        }
+        else if (opened) {
+            if (mined) {
+                hexagon.setFill(OPENED_MINED_CELL);
+            }
+            else {
+                hexagon.setFill(OPENED_EMPTY_CELL);
             }
         }
         else {
-            hexagon.setFill(MARKED_CELL);
+            hexagon.setFill(CLOSED_CELL);
         }
     }
 
