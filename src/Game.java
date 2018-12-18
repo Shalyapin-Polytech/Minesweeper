@@ -29,6 +29,10 @@ class Game {
         this.gameMode = gameMode;
     }
 
+    int getRemainingNOfMarks() {
+        return remainingNOfMarks;
+    }
+
     boolean isBlocked() {
         return blocked;
     }
@@ -160,12 +164,12 @@ class Game {
         }
     }
 
-    void mark(Cell cell) {
-        action(cell, Action.MARK);
-    }
-
     void open(Cell cell) {
         action(cell, Action.OPEN);
+    }
+
+    void mark(Cell cell) {
+        action(cell, Action.MARK);
     }
 
     private void addMouseListener(Cell cell) {

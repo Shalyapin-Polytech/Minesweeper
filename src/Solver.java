@@ -123,7 +123,12 @@ class Solver {
                     closedCells.add(cell);
                 }
             });
-            game.open(closedCells.get(new Random().nextInt(closedCells.size())));
+            if (closedCells.size() == game.getRemainingNOfMarks()) {
+                closedCells.forEach(cell -> game.mark(cell));
+            }
+            else {
+                game.open(closedCells.get(new Random().nextInt(closedCells.size())));
+            }
         }
 
 //        if (changed && !game.isBlocked()) {

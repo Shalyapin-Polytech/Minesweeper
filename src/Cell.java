@@ -79,7 +79,6 @@ class Cell {
         rewriteLabel();
     }
 
-    @SuppressWarnings({"inverted", "BooleanMethodIsAlwaysInverted"})
     boolean isOpened() {
         return opened;
     }
