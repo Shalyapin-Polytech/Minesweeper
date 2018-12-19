@@ -12,15 +12,16 @@ class Solver {
     private class CellsGroup extends HashSet<Cell> {
         private int nOfMines;
 
-        CellsGroup(Cell cell) {
-            if (cell.isOpened()) {
-                Set<Cell> neighbors = game.getNeighbors(cell);
+        CellsGroup(Cell baseCell) {
+            if (baseCell.isOpened()) {
+                Set<Cell> neighbors = game.getNeighbors(baseCell);
                 Set<Cell> closedNeighbors = new HashSet<>(neighbors).stream()
                         .filter(n -> !n.isOpened() && !n.isMarked()).collect(Collectors.toSet());
                 Set<Cell> markedNeighbors = new HashSet<>(neighbors).stream()
                         .filter(Cell::isMarked).collect(Collectors.toSet());
+
                 addAll(closedNeighbors);
-                this.nOfMines = cell.getNOfMinedNeighbors() - markedNeighbors.size();
+                this.nOfMines = baseCell.getNOfMinedNeighbors() - markedNeighbors.size();
             }
         }
 
@@ -68,9 +69,11 @@ class Solver {
                 changed.set(true);
             }
             else if (borderCellsGroup.nOfMines == borderCellsGroup.size()) {
-                ///
-                borderCellsGroup.removeIf(Cell::isMarked);
-                borderCellsGroup.forEach(cell -> game.mark(cell));
+                borderCellsGroup.forEach(cell -> {
+                    if (!cell.isMarked()) {
+                        game.mark(cell);
+                    }
+                });
                 changed.set(true);
             }
         }

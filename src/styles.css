@@ -38,6 +38,10 @@
     -fx-border-color: #a2a9b1;
 }
 
+.n-of-marks-label {
+    -fx-min-width: 6em;
+}
+
 .result-pane {
     -fx-font: 3em 'sans-serif';
     -fx-padding: 15;

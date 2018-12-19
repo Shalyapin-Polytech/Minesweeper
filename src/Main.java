@@ -84,6 +84,7 @@ public class Main extends Application {
         });
         gameMenuPane.getChildren().add(exitToMenuButton);
 
+        remainingNOfMarksLabel.getStyleClass().add("n-of-marks-label");
         gameMenuPane.getChildren().add(remainingNOfMarksLabel);
 
         GridPane gamePane = new GridPane();
