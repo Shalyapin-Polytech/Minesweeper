@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 class Solver {
@@ -8,19 +9,26 @@ class Solver {
         this.game = game;
     }
 
-    private class CellsGroup<E> extends HashSet<E> {
+    private class CellsGroup extends HashSet<Cell> {
         private int nOfMines;
 
-        CellsGroup(Set<E> cells, int nOfMines) {
-            addAll(cells);
-            this.nOfMines = nOfMines;
+        CellsGroup(Cell cell) {
+            if (cell.isOpened()) {
+                Set<Cell> neighbors = game.getNeighbors(cell);
+                Set<Cell> closedNeighbors = new HashSet<>(neighbors).stream()
+                        .filter(n -> !n.isOpened() && !n.isMarked()).collect(Collectors.toSet());
+                Set<Cell> markedNeighbors = new HashSet<>(neighbors).stream()
+                        .filter(Cell::isMarked).collect(Collectors.toSet());
+                addAll(closedNeighbors);
+                this.nOfMines = cell.getNOfMinedNeighbors() - markedNeighbors.size();
+            }
         }
 
-        boolean includes(CellsGroup<E> another) {
+        boolean includes(CellsGroup another) {
             return containsAll(another) && nOfMines >= another.nOfMines;
         }
 
-        void subtract(CellsGroup<E> another) {
+        void subtract(CellsGroup another) {
             removeAll(another);
             nOfMines -= another.nOfMines;
         }
@@ -31,32 +39,12 @@ class Solver {
         }
     }
 
-    private CellsGroup<Cell> createCellsGroup(Cell cell) {
-        if (cell.isOpened()) {
-            Set<Cell> neighbors = game.getNeighbors(cell);
-            Set<Cell> closedNeighbors = new HashSet<>(neighbors).stream()
-                    .filter(n -> !n.isOpened() && !n.isMarked()).collect(Collectors.toSet());
-            Set<Cell> markedNeighbors = new HashSet<>(neighbors).stream()
-                    .filter(Cell::isMarked).collect(Collectors.toSet());
-            if (closedNeighbors.size() != 0) {
-                return new CellsGroup<>(closedNeighbors, cell.getNOfMinedNeighbors() - markedNeighbors.size());
-            }
-        }
-        return null;
-    }
-
-    void solve() {
-        boolean changed = false;
-        if (game.isFirstMove()) {
-            game.open(game.getRandCell());
-            changed = true;
-        }
-
-        Set<CellsGroup<Cell>> borderCellsGroups = new HashSet<>();
+    private Set<CellsGroup> getBorderCellsGroups() {
+        Set<CellsGroup> borderCellsGroups = new HashSet<>();
         game.forEachCell(cell -> {
-            CellsGroup<Cell> thisGroup = createCellsGroup(cell);
-            if (thisGroup != null) {
-                for (CellsGroup<Cell> anotherGroup : borderCellsGroups) {
+            CellsGroup thisGroup = new CellsGroup(cell);
+            if (thisGroup.size() != 0) {
+                for (CellsGroup anotherGroup : borderCellsGroups) {
                     if (thisGroup.equals(anotherGroup)) {
                         continue;
                     }
@@ -70,65 +58,85 @@ class Solver {
                 borderCellsGroups.add(thisGroup);
             }
         });
+        return borderCellsGroups;
+    }
 
-        for (CellsGroup<Cell> borderCellsGroup : borderCellsGroups) {
+    private void subtractionMethod(Set<CellsGroup> borderCellsGroups, AtomicBoolean changed) {
+        for (CellsGroup borderCellsGroup : borderCellsGroups) {
             if (borderCellsGroup.nOfMines == 0) {
                 borderCellsGroup.forEach(cell -> game.open(cell));
-                changed = true;
+                changed.set(true);
             }
             else if (borderCellsGroup.nOfMines == borderCellsGroup.size()) {
                 ///
                 borderCellsGroup.removeIf(Cell::isMarked);
                 borderCellsGroup.forEach(cell -> game.mark(cell));
-                changed = true;
+                changed.set(true);
+            }
+        }
+    }
+
+    private void probabilityMethod(Set<CellsGroup> borderCellsGroups, AtomicBoolean changed) {
+        Map<Cell, Double> probabilities = new HashMap<>();
+        for (CellsGroup borderCellsGroup : borderCellsGroups) {
+            if (borderCellsGroup.size() > 0) {
+                borderCellsGroup.forEach(cell -> {
+                    double indieProbability = borderCellsGroup.nOfMines / (double) borderCellsGroup.size();
+                    double oldProbability = probabilities.get(cell) != null ? probabilities.get(cell) : 0;
+                    double newProbability = 1 - (1 - indieProbability) * (1 - oldProbability);
+                    probabilities.put(cell, newProbability);
+                });
             }
         }
 
-        if (!changed && borderCellsGroups.size() > 0 && !game.isBlocked()) {
-            Map<Cell, Double> probabilities = new HashMap<>();
-            for (CellsGroup<Cell> borderCellsGroup : borderCellsGroups) {
-                if (borderCellsGroup.size() > 0) {
-                    borderCellsGroup.forEach(cell -> {
-                        double indieProbability = borderCellsGroup.nOfMines / (double) borderCellsGroup.size();
-                        double oldProbability = probabilities.get(cell) != null ? probabilities.get(cell) : 0;
-                        double newProbability = 1 - (1 - indieProbability) * (1 - oldProbability);
-                        probabilities.put(cell, newProbability);
-                    });
-                }
-            }
+        Cell maxProbabilityCell = Collections.max(
+                probabilities.entrySet(),
+                Comparator.comparingDouble(Map.Entry::getValue)
+        ).getKey();
+        Cell minProbabilityCell = Collections.min(
+                probabilities.entrySet(),
+                Comparator.comparingDouble(Map.Entry::getValue)
+        ).getKey();
 
-            Cell maxProbabilityCell = Collections.max(
-                    probabilities.entrySet(),
-                    Comparator.comparingDouble(Map.Entry::getValue)
-            ).getKey();
-            Cell minProbabilityCell = Collections.min(
-                    probabilities.entrySet(),
-                    Comparator.comparingDouble(Map.Entry::getValue)
-            ).getKey();
+        if (probabilities.get(minProbabilityCell)  < 1 - probabilities.get(maxProbabilityCell)) {
+            game.open(minProbabilityCell);
+            changed.set(true);
+        }
+        else {
+            game.mark(maxProbabilityCell);
+            changed.set(true);
+        }
+    }
 
-            if (probabilities.get(minProbabilityCell)  < 1 - probabilities.get(maxProbabilityCell)) {
-                game.open(minProbabilityCell);
-                changed = true;
+    private void randMove() {
+        List<Cell> closedCells = new ArrayList<>();
+        game.forEachCell(cell -> {
+            if (!cell.isOpened() && !cell.isMarked()) {
+                closedCells.add(cell);
             }
-            else {
-                game.mark(maxProbabilityCell);
-                changed = true;
-            }
+        });
+        if (closedCells.size() == game.getRemainingNOfMarks()) {
+            closedCells.forEach(cell -> game.mark(cell));
+        }
+        else {
+            game.open(closedCells.get(new Random().nextInt(closedCells.size())));
+        }
+    }
+
+    void solve() {
+        AtomicBoolean changed = new AtomicBoolean(false);
+        if (game.isFirstMove()) {
+            game.open(game.getRandCell());
+            changed.set(true);
         }
 
-        if (!changed && borderCellsGroups.size() == 0 && !game.isBlocked()) {
-            List<Cell> closedCells = new ArrayList<>();
-            game.forEachCell(cell -> {
-                if (!cell.isOpened() && !cell.isMarked()) {
-                    closedCells.add(cell);
-                }
-            });
-            if (closedCells.size() == game.getRemainingNOfMarks()) {
-                closedCells.forEach(cell -> game.mark(cell));
-            }
-            else {
-                game.open(closedCells.get(new Random().nextInt(closedCells.size())));
-            }
+        Set<CellsGroup> borderCellsGroups = getBorderCellsGroups();
+        subtractionMethod(borderCellsGroups, changed);
+        if (!changed.get() && borderCellsGroups.size() > 0 && !game.isBlocked()) {
+            probabilityMethod(borderCellsGroups, changed);
+        }
+        if (!changed.get() && borderCellsGroups.size() == 0 && !game.isBlocked()) {
+            randMove();
         }
 
 //        if (changed && !game.isBlocked()) {
