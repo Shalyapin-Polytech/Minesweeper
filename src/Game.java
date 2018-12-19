@@ -1,11 +1,13 @@
 import java.util.*;
-import java.util.function.Consumer;
+import java.util.stream.Collectors;
 import javafx.scene.*;
 import static java.lang.StrictMath.sqrt;
 
 class Game {
     private List<List<Cell>> field = new ArrayList<>();
     private Group group = new Group();
+    private Set<Cell> isolatedClosedCells = new HashSet<>();
+    private Set<Cell> openedBorderCells = new HashSet<>();
     private double windowWidth, windowHeight;
     private int width, height;
     private GameMode gameMode;
@@ -19,6 +21,14 @@ class Game {
 
     Group getGroup() {
         return group;
+    }
+
+    Set<Cell> getIsolatedClosedCells() {
+        return isolatedClosedCells;
+    }
+
+    Set<Cell> getOpenedBorderCells() {
+        return openedBorderCells;
     }
 
     void setWidth(int width) {
@@ -41,16 +51,6 @@ class Game {
         return firstMove;
     }
 
-    void forEachCell(Consumer<Cell> action) {
-        field.forEach(row -> row.forEach(action));
-    }
-
-    Cell getRandCell() {
-        int randWidth = new Random().nextInt(width);
-        int randHeight = new Random().nextInt(height);
-        return field.get(randWidth).get(randHeight);
-    }
-
     void restart() {
         clearField();
         createField();
@@ -58,11 +58,11 @@ class Game {
     }
 
     void demonstrateMines() {
-        forEachCell(cell -> {
+        field.forEach(row -> row.forEach(cell -> {
             if (cell.isMined() && !cell.isOpened()) {
                 cell.demonstrate();
             }
-        });
+        }));
         blocked = true;
     }
 
@@ -100,6 +100,17 @@ class Game {
     private void openWithNeighbors(Cell cell) {
         cell.open();
         Set<Cell> neighbors = getNeighbors(cell);
+        isolatedClosedCells.remove(cell);
+        isolatedClosedCells.removeAll(neighbors);
+        for (Cell neighbor : neighbors) {
+            Set<Cell> closedGrandNeighbors = getNeighbors(neighbor).stream()
+                    .filter(grandNeighbor -> !grandNeighbor.isOpened() && !grandNeighbor.isMarked())
+                    .collect(Collectors.toSet());
+            if (closedGrandNeighbors.size() == 0) {
+                openedBorderCells.remove(neighbor);
+            }
+        }
+
         if (!cell.isMined()) {
             if (cell.getNOfMinedNeighbors() == 0) {
                 for (Cell neighbor : neighbors) {
@@ -107,6 +118,9 @@ class Game {
                         openWithNeighbors(neighbor);
                     }
                 }
+            }
+            else {
+                openedBorderCells.add(cell);
             }
         }
     }
@@ -185,7 +199,8 @@ class Game {
 
     private void setMines(Cell forbiddenCell) {
         for (int i = remainingNOfMines; i > 0;) {
-            Cell randCell = getRandCell();
+            Random rand = new Random();
+            Cell randCell = field.get(rand.nextInt(width)).get(rand.nextInt(height));
             if (!randCell.equals(forbiddenCell) && !randCell.isMined()) {
                 randCell.mine();
                 i--;
@@ -214,6 +229,7 @@ class Game {
                 cell.setIndexY(j);
                 addMouseListener(cell);
                 row.add(cell);
+                isolatedClosedCells.add(cell);
 
                 group.getChildren().addAll(
                     cell.getHexagon(),
@@ -237,6 +253,8 @@ class Game {
     private void clearField() {
         firstMove = true;
         field.clear();
+        isolatedClosedCells.clear();
+        openedBorderCells.clear();
         group.getChildren().clear();
     }
 }
