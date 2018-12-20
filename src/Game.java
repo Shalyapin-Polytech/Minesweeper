@@ -114,7 +114,7 @@ class Game {
         if (!cell.isMined()) {
             if (cell.getNOfMinedNeighbors() == 0) {
                 for (Cell neighbor : neighbors) {
-                    if (!neighbor.isOpened()) {
+                    if (!neighbor.isOpened() && !neighbor.isMarked()) {
                         openWithNeighbors(neighbor);
                     }
                 }

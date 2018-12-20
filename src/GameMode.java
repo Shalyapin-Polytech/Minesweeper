@@ -20,7 +20,7 @@ enum GameMode {
     IMPOSSIBLE {
         @Override
         public double getProportionOfMines() {
-            return 0.3;
+            return 0.25;
         }
     };
 

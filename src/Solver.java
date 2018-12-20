@@ -4,6 +4,8 @@ import java.util.stream.Collectors;
 
 class Solver {
     private Game game;
+    private Set<CellsGroup> borderCellsGroups;
+    private AtomicBoolean changed;
 
     Solver(Game game) {
         this.game = game;
@@ -62,7 +64,7 @@ class Solver {
         return borderCellsGroups;
     }
 
-    private void subtractionMethod(Set<CellsGroup> borderCellsGroups, AtomicBoolean changed) {
+    private void subtractionMethod() {
         for (CellsGroup borderCellsGroup : borderCellsGroups) {
             if (borderCellsGroup.nOfMines == 0) {
                 borderCellsGroup.forEach(cell -> game.open(cell));
@@ -77,9 +79,10 @@ class Solver {
                 changed.set(true);
             }
         }
+        borderCellsGroups = getBorderCellsGroups();
     }
 
-    private void probabilityMethod(Set<CellsGroup> borderCellsGroups, AtomicBoolean changed) {
+    private void probabilityMethod() {
         Map<Cell, Double> probabilities = new HashMap<>();
         for (CellsGroup borderCellsGroup : borderCellsGroups) {
             if (borderCellsGroup.size() > 0) {
@@ -103,8 +106,7 @@ class Solver {
         ).getKey();
         double minProbability = probabilities.get(minProbabilityCell);
 
-        Set<Cell> isolatedClosedCells = game.getIsolatedClosedCells();
-        int nOfIsolatedClosedCells = isolatedClosedCells.size();
+        int nOfIsolatedClosedCells = game.getIsolatedClosedCells().size();
         if (nOfIsolatedClosedCells > 0) {
             int nOfMinedBorderCells = 0;
             for (CellsGroup borderCellsGroup : borderCellsGroups) {
@@ -112,7 +114,7 @@ class Solver {
             }
             double randOpenProbability = ( game.getRemainingNOfMarks() - nOfMinedBorderCells ) / (double) nOfIsolatedClosedCells;
             if (randOpenProbability < minProbability && randOpenProbability < 1 - maxProbability) {
-                randMove(isolatedClosedCells, changed);
+                randMove();
             }
         }
         if (!changed.get()) {
@@ -124,37 +126,40 @@ class Solver {
                 game.mark(maxProbabilityCell);
                 changed.set(true);
             }
+            borderCellsGroups = getBorderCellsGroups();
         }
     }
 
-    private void randMove(Set<Cell> isolatedClosedCells, AtomicBoolean changed) {
+    private void randMove() {
+        Set<Cell> isolatedClosedCells = game.getIsolatedClosedCells();
         int nOfIsolatedClosedCells = isolatedClosedCells.size();
-        if (nOfIsolatedClosedCells == game.getRemainingNOfMarks()) {
+        if (borderCellsGroups.size() == 0 && nOfIsolatedClosedCells == game.getRemainingNOfMarks()) {
             isolatedClosedCells.forEach(cell -> game.mark(cell));
         }
         else {
             game.open(new ArrayList<>(isolatedClosedCells).get(new Random().nextInt(nOfIsolatedClosedCells)));
         }
         changed.set(nOfIsolatedClosedCells > 0);
+        borderCellsGroups = getBorderCellsGroups();
     }
 
     void solve() {
-        AtomicBoolean changed = new AtomicBoolean(false);
-        if (game.isFirstMove()) {
-            randMove(game.getIsolatedClosedCells(), changed);
-        }
+        changed = new AtomicBoolean(false);
+        borderCellsGroups = getBorderCellsGroups();
 
-        Set<CellsGroup> borderCellsGroups = getBorderCellsGroups();
-        subtractionMethod(borderCellsGroups, changed);
+        if (game.isFirstMove()) {
+            randMove();
+        }
+        subtractionMethod();
         if (!changed.get() && borderCellsGroups.size() > 0 && !game.isBlocked()) {
-            probabilityMethod(borderCellsGroups, changed);
+            probabilityMethod();
         }
         if (!changed.get() && borderCellsGroups.size() == 0 && !game.isBlocked()) {
-            randMove(game.getIsolatedClosedCells(), changed);
+            randMove();
         }
 
-//        if (changed && !game.isBlocked()) {
-//            solve();
-//        }
+        if (changed.get() && !game.isBlocked()) {
+            solve();
+        }
     }
 }
