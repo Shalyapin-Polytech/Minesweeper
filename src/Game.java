@@ -97,6 +97,11 @@ class Game {
         return neighbors;
     }
 
+    private void finish(boolean result) {
+        demonstrateMines();
+        Main.createGameResultStage(result);
+    }
+
     private void openWithNeighbors(Cell cell) {
         cell.open();
         Set<Cell> neighbors = getNeighbors(cell);
@@ -157,9 +162,7 @@ class Game {
                     mark(cell, false);
                 }
                 if (cell.isMined()) {
-                    demonstrateMines();
-                    blocked = true;
-                    Main.createGameResultStage(false);
+                    finish(false);
                 }
             }
             if (action == Action.MARK) {
@@ -169,8 +172,7 @@ class Game {
                 else if (remainingNOfMarks > 0) {
                     mark(cell, true);
                     if (remainingNOfMines == 0) {
-                        blocked = true;
-                        Main.createGameResultStage(true);
+                        finish(true);
                     }
                 }
             }
