@@ -12,7 +12,7 @@ class Game {
     private int width, height;
     private GameMode gameMode;
     private int remainingNOfMarks, remainingNOfMines = 0;
-    private boolean blocked, firstMove;
+    private boolean finished, firstMove;
 
     Game(double windowWidth, double windowHeight) {
         this.windowWidth = windowWidth;
@@ -43,8 +43,8 @@ class Game {
         return remainingNOfMarks;
     }
 
-    boolean isBlocked() {
-        return blocked;
+    boolean isFinished() {
+        return finished;
     }
 
     boolean isFirstMove() {
@@ -54,7 +54,7 @@ class Game {
     void restart() {
         clearField();
         createField();
-        blocked = false;
+        finished = false;
     }
 
     void demonstrateMines() {
@@ -63,7 +63,7 @@ class Game {
                 cell.demonstrate();
             }
         }));
-        blocked = true;
+        finished = true;
     }
 
     Set<Cell> getNeighbors(Cell cell) {
@@ -145,7 +145,7 @@ class Game {
     }
 
     private void action(Cell cell, Action action) {
-        if (!blocked) {
+        if (!finished) {
             if (firstMove) {
                 setMines(cell);
                 firstMove = false;

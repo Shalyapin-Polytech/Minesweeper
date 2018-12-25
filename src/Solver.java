@@ -119,6 +119,7 @@ class Solver {
                 randMove();
             }
         }
+
         if (!changed) {
             if (minProbability < 1 - maxProbability) {
                 game.open(minProbabilityCell);
@@ -154,13 +155,13 @@ class Solver {
                 randMove();
             }
             subtractionMethod();
-            if (!changed && borderCellsGroups.size() > 0 && !game.isBlocked()) {
+            if (!changed && borderCellsGroups.size() > 0 && !game.isFinished()) {
                 probabilityMethod();
             }
-            if (!changed && borderCellsGroups.size() == 0 && !game.isBlocked()) {
+            if (!changed && borderCellsGroups.size() == 0 && !game.isFinished()) {
                 randMove();
             }
         }
-        while (changed && !game.isBlocked());
+        while (changed && !game.isFinished());
     }
 }
