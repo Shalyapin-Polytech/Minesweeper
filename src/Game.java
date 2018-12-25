@@ -107,26 +107,20 @@ class Game {
         Set<Cell> neighbors = getNeighbors(cell);
         isolatedClosedCells.remove(cell);
         isolatedClosedCells.removeAll(neighbors);
-        for (Cell neighbor : neighbors) {
+        neighbors.forEach(neighbor -> {
             Set<Cell> closedGrandNeighbors = getNeighbors(neighbor).stream()
                     .filter(grandNeighbor -> !grandNeighbor.isOpened() && !grandNeighbor.isMarked())
                     .collect(Collectors.toSet());
             if (closedGrandNeighbors.size() == 0) {
                 openedBorderCells.remove(neighbor);
             }
-        }
+            if (!cell.isMined() && cell.getNOfMinedNeighbors() == 0 && !neighbor.isOpened() && !neighbor.isMarked()) {
+                openWithNeighbors(neighbor);
+            }
+        });
 
-        if (!cell.isMined()) {
-            if (cell.getNOfMinedNeighbors() == 0) {
-                for (Cell neighbor : neighbors) {
-                    if (!neighbor.isOpened() && !neighbor.isMarked()) {
-                        openWithNeighbors(neighbor);
-                    }
-                }
-            }
-            else {
-                openedBorderCells.add(cell);
-            }
+        if (!cell.isMined() && cell.getNOfMinedNeighbors() > 0) {
+            openedBorderCells.add(cell);
         }
     }
 
@@ -207,9 +201,7 @@ class Game {
                 randCell.mine();
                 i--;
 
-                for (Cell neighbor : getNeighbors(randCell)) {
-                    neighbor.setNOfMinedNeighbors(neighbor.getNOfMinedNeighbors() + 1);
-                }
+                getNeighbors(randCell).forEach(neighbor -> neighbor.setNOfMinedNeighbors(neighbor.getNOfMinedNeighbors() + 1));
             }
         }
     }
