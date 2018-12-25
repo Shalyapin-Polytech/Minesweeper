@@ -146,22 +146,21 @@ class Solver {
     }
 
     void solve() {
-        changed = false;
-        borderCellsGroups = getBorderCellsGroups();
+        do {
+            changed = false;
+            borderCellsGroups = getBorderCellsGroups();
 
-        if (game.isFirstMove()) {
-            randMove();
+            if (game.isFirstMove()) {
+                randMove();
+            }
+            subtractionMethod();
+            if (!changed && borderCellsGroups.size() > 0 && !game.isBlocked()) {
+                probabilityMethod();
+            }
+            if (!changed && borderCellsGroups.size() == 0 && !game.isBlocked()) {
+                randMove();
+            }
         }
-        subtractionMethod();
-        if (!changed && borderCellsGroups.size() > 0 && !game.isBlocked()) {
-            probabilityMethod();
-        }
-        if (!changed && borderCellsGroups.size() == 0 && !game.isBlocked()) {
-            randMove();
-        }
-
-//        if (changed && !game.isBlocked()) {
-//            solve();
-//        }
+        while (changed && !game.isBlocked());
     }
 }
